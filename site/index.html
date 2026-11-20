@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>problem-solving-daily — 9 real problems, solved in 3D</title>
+    <meta
+      name="description"
+      content="A 3D catalogue of real-world engineering problems: 9 problems, 6 categories, 253 tests, every one with a brief, code and a CLI."
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="preload" href="assets/three.module.js" as="script" crossorigin="anonymous" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./assets/three.module.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#catalog">Skip to the catalogue</a>
+
+    <header class="nav">
+      <a class="brand" href="#top">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span class="brand__text">problem-solving-daily</span>
+      </a>
+      <nav class="nav__links" aria-label="Sections">
+        <a href="#catalog">Catalogue</a>
+        <a href="#numbers">Numbers</a>
+        <a href="#how">How it works</a>
+      </nav>
+      <a class="nav__cta" id="repo-link" href="#" rel="noreferrer">GitHub ↗</a>
+    </header>
+
+    <main id="top">
+      <!-- ------------------------------------------------------------------ -->
+      <section class="hero" aria-labelledby="hero-title">
+        <canvas id="hero-canvas" class="scene" aria-hidden="true"></canvas>
+        <div class="hero__glow" aria-hidden="true"></div>
+
+        <div class="hero__copy">
+          <p class="eyebrow">
+            <span class="dot" aria-hidden="true"></span>
+            real-world engineering problems · solved end to end
+          </p>
+          <h1 id="hero-title">
+            Practice that looks like
+            <span class="gradient">the work you actually do</span>
+          </h1>
+          <p class="lede">
+            Dirty CSVs, a tokenizer that must not lose a whitespace, an HTTP parser fed
+            one byte at a time, a rate limiter under eight threads. Every problem ships
+            with a written brief, runnable code, a test suite and a CLI.
+          </p>
+
+          <div class="hero__actions">
+            <a class="button button--primary" href="#catalog">Explore the 3D catalogue</a>
+            <a class="button button--ghost" id="hero-repo" href="#" rel="noreferrer">
+              Read the source ↗
+            </a>
+          </div>
+
+          <dl class="stats" id="hero-stats" aria-label="Repository statistics"></dl>
+          <ul class="legend" id="hero-legend" aria-label="Categories"></ul>
+        </div>
+
+        <p class="scroll-hint" aria-hidden="true">scroll<span></span></p>
+      </section>
+
+      <!-- ------------------------------------------------------------------ -->
+      <section class="section" id="catalog" aria-labelledby="catalog-title">
+        <div class="section__head">
+          <div>
+            <p class="eyebrow">scene 02 · catalogue galaxy</p>
+            <h2 id="catalog-title">Nine problems, six categories</h2>
+            <p class="section__lede">
+              Each node is a problem. Drag to orbit, hover to preview, click to jump to
+              its card. Filter a category to dim the rest of the galaxy.
+            </p>
+          </div>
+          <div class="filters" id="filters" role="group" aria-label="Filter by category"></div>
+        </div>
+
+        <div class="catalog">
+          <div class="galaxy">
+            <canvas id="galaxy-canvas" class="scene" aria-label="3D catalogue of problems"></canvas>
+            <p class="galaxy__hint">drag to orbit · hover a node · click to select</p>
+          </div>
+          <div class="cards" id="cards"></div>
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------------------------ -->
+      <section class="section" id="numbers" aria-labelledby="numbers-title">
+        <div class="section__head">
+          <div>
+            <p class="eyebrow">scene 03 · test coverage</p>
+            <h2 id="numbers-title">Tests are the deliverable</h2>
+            <p class="section__lede">
+              Bar height is the number of tests for that problem. Hover a bar for the
+              title, drag to spin the chart.
+            </p>
+          </div>
+        </div>
+
+        <div class="numbers">
+          <div class="bars">
+            <canvas id="bars-canvas" class="scene" aria-label="3D bar chart of tests per problem"></canvas>
+          </div>
+          <div class="stat-stack" id="stat-stack"></div>
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------------------------ -->
+      <section class="section section--split" id="how" aria-labelledby="how-title">
+        <div class="how-copy">
+          <p class="eyebrow">scene 04 · how a problem is built</p>
+          <h2 id="how-title">Brief → code → tests</h2>
+          <ol class="steps" id="steps">
+            <li>
+              <span class="steps__num">01</span>
+              <div>
+                <h3><code>problem.md</code> is the ticket</h3>
+                <p>
+                  Context, input/output, numbered requirements with a <em>why</em>, an
+                  assumptions section and documented limits.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span class="steps__num">02</span>
+              <div>
+                <h3><code>solution/</code> is the answer</h3>
+                <p>
+                  <code>main.py</code> carries the reasoning in its docstring, with
+                  runnable <code>&gt;&gt;&gt;</code> examples, plus a thin CLI wrapper.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span class="steps__num">03</span>
+              <div>
+                <h3><code>tests/</code> is the proof</h3>
+                <p>
+                  Empty input, malformed input, ties, collisions, clock going backwards,
+                  threads, bytes split at every offset.
+                </p>
+              </div>
+            </li>
+          </ol>
+          <pre class="snippet"><code>python scripts/run_tests.py        <span class="c"># 253 tests, 40 doctests</span>
+python scripts/build_catalog.py    <span class="c"># rebuild this page's data</span>
+python scripts/new_problem.py ai "Eval harness" --level hard</code></pre>
+        </div>
+
+        <div class="how-scene">
+          <canvas id="structure-canvas" class="scene" aria-label="Wireframe structure of a problem folder"></canvas>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer__inner">
+        <p>
+          <strong>problem-solving-daily</strong> — MIT licensed, standard library only.
+        </p>
+        <p class="footer__meta" id="footer-meta"></p>
+      </div>
+    </footer>
+
+    <div class="tooltip" id="tooltip" role="status" aria-live="polite" hidden></div>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
