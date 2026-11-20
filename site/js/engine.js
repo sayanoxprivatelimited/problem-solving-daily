@@ -87,7 +87,8 @@ export class Stage {
       alpha: true,
       powerPreference: 'high-performance',
     });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    // 2x retina triples the fragment work for a barely visible gain on these scenes.
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
     this.renderer.setClearAlpha(0);
 
     this.scene = new THREE.Scene();
@@ -116,6 +117,17 @@ export class Stage {
       { threshold: 0.01 },
     );
     this._intersection.observe(canvas);
+
+    // A hidden tab should cost nothing: the animation loop is cancelled, not paused.
+    this._onVisibility = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(this._animation);
+        this._animation = null;
+      } else if (!this.reducedMotion && !this._animation) {
+        this._frame();
+      }
+    };
+    document.addEventListener('visibilitychange', this._onVisibility);
 
     this.resize();
     this._frame = this._frame.bind(this);
@@ -155,6 +167,8 @@ export class Stage {
 
   dispose() {
     cancelAnimationFrame(this._animation);
+    this._animation = null;
+    document.removeEventListener('visibilitychange', this._onVisibility);
     this._resizeObserver.disconnect();
     this._intersection.disconnect();
     window.removeEventListener('pointermove', this._onPointerMove);

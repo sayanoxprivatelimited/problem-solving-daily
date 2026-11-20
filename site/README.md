@@ -90,13 +90,27 @@ node --test site/tests/*.test.mjs     # or: make site-test
 
 ## Accessibility & performance notes
 
-- Content is real DOM: headings, links, `<ol>` steps. The canvases are decoration; if
-  WebGL is unavailable the page adds `.no-webgl`, hides the canvases and keeps working.
-- `prefers-reduced-motion: reduce` renders a single static frame instead of animating.
-- Rendering pauses when a canvas scrolls out of view (`IntersectionObserver`), and the
-  device pixel ratio is capped at 2.
-- Hover-only affordances are duplicated: cards are real links, `Escape` clears a
-  selection, filters are `<button aria-pressed>`.
+The page is built so that a slow phone can still read it:
+
+- **Scenes boot on approach, not on load.** Each canvas gets its own
+  `IntersectionObserver` with a 400px `rootMargin`; until then its module (and
+  Three.js itself) is not downloaded and no WebGL context exists. One context at
+  first paint instead of four.
+- **No allocations in the animation loop.** Scale lerps and label projections reuse a
+  scratch `Vector3`; cursor writes are de-duplicated before touching `style`, which
+  otherwise invalidates style every frame.
+- **Hidden tabs cost nothing.** The stage cancels its `requestAnimationFrame` on
+  `visibilitychange` and resumes when the tab is back.
+- **Pixel ratio is capped at 1.75.** A 3x retina canvas would triple the fragment work
+  for a gradient-heavy scene you cannot tell apart.
+- **Off-screen canvases stop rendering** (the stage pauses when its canvas leaves the
+  viewport) and `prefers-reduced-motion` renders a single frame instead of a loop.
+- **Content first.** Cards, filters, the detail sheet, search and the theme are plain
+  DOM; when WebGL is missing the canvases are hidden and everything else still works.
+- **Keyboard and screen readers:** skip link, labelled controls, `aria-pressed` on the
+  filters and theme button, `role="status"` on the result count and tooltip, focus
+  returned to the card after the sheet closes.
+
 
 ## Vendored dependency
 

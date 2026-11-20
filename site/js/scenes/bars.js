@@ -87,10 +87,20 @@ export function createBarsScene(canvas, problems, { onHover } = {}) {
   let lastX = 0;
   let hovered = null;
 
+  // Same reason as in the galaxy: no per-frame style writes, no per-frame allocations.
+  let cursor = 'grab';
+  const setCursor = (next) => {
+    if (next === cursor) return;
+    cursor = next;
+    canvas.style.cursor = next;
+  };
+  canvas.style.cursor = cursor;
+  const origin = new THREE.Vector3();
+
   canvas.addEventListener('pointerdown', (event) => {
     dragging = true;
     lastX = event.clientX;
-    canvas.style.cursor = 'grabbing';
+    setCursor('grabbing');
   });
   canvas.addEventListener('pointermove', (event) => {
     if (!dragging) return;
@@ -99,7 +109,7 @@ export function createBarsScene(canvas, problems, { onHover } = {}) {
   });
   const endDrag = () => {
     dragging = false;
-    canvas.style.cursor = hovered ? 'pointer' : 'grab';
+    setCursor(hovered ? 'pointer' : 'grab');
   };
   canvas.addEventListener('pointerup', endDrag);
   canvas.addEventListener('pointercancel', endDrag);
@@ -117,7 +127,8 @@ export function createBarsScene(canvas, problems, { onHover } = {}) {
     }
     if (!onHover) return;
     const rect = canvas.getBoundingClientRect();
-    const point = new THREE.Vector3(bar.entry.x, bar.entry.height, 0)
+    const point = origin
+      .set(bar.entry.x, bar.entry.height, 0)
       .applyMatrix4(world.matrixWorld)
       .project(stage.camera);
     onHover(bar.entry, {
@@ -134,7 +145,7 @@ export function createBarsScene(canvas, problems, { onHover } = {}) {
     const hits = raycaster.intersectObjects(pickables, false);
     const bar = hits.length ? bars.find((entry) => entry.mesh === hits[0].object) : null;
     setHover(bar ?? null);
-    canvas.style.cursor = hovered ? 'pointer' : dragging ? 'grabbing' : 'grab';
+    setCursor(hovered ? 'pointer' : dragging ? 'grabbing' : 'grab');
 
     for (const item of bars) {
       const target = item === hovered ? 1.18 : 1;

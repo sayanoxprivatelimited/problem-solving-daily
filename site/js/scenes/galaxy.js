@@ -48,6 +48,10 @@ export function createGalaxyScene(canvas, problems, { onHover, onSelect, initial
     world.add(ring);
   }
 
+  // One scratch vector for every per-frame scale write: allocating inside the
+  // animation loop is what turns a smooth scene into a stuttery one after a minute.
+  const scratchScale = new THREE.Vector3();
+
   const positions = galaxyPositions(problems);
   const nodeGeometry = new THREE.SphereGeometry(0.34, 28, 22);
   const nodes = [];
@@ -132,14 +136,14 @@ export function createGalaxyScene(canvas, problems, { onHover, onSelect, initial
         });
       }
     }
-    canvas.style.cursor = node ? 'pointer' : dragging ? 'grabbing' : 'grab';
+    setCursor(node ? 'pointer' : dragging ? 'grabbing' : 'grab');
   };
 
   canvas.addEventListener('pointerdown', (event) => {
     dragging = true;
     idleSpin = 0;
     lastX = event.clientX;
-    canvas.style.cursor = 'grabbing';
+    setCursor('grabbing');
     canvas.setPointerCapture?.(event.pointerId);
   });
 
@@ -150,9 +154,19 @@ export function createGalaxyScene(canvas, problems, { onHover, onSelect, initial
     lastX = event.clientX;
   });
 
+  // Writing `style.cursor` every frame invalidates style for no reason; only write
+  // it when the value actually changes.
+  let cursor = 'grab';
+  const setCursor = (next) => {
+    if (next === cursor) return;
+    cursor = next;
+    canvas.style.cursor = next;
+  };
+  canvas.style.cursor = cursor;
+
   const endDrag = () => {
     dragging = false;
-    canvas.style.cursor = hovered ? 'pointer' : 'grab';
+    setCursor(hovered ? 'pointer' : 'grab');
   };
   canvas.addEventListener('pointerup', endDrag);
   canvas.addEventListener('pointercancel', endDrag);
@@ -188,7 +202,7 @@ export function createGalaxyScene(canvas, problems, { onHover, onSelect, initial
       const targetScale = dimmed ? 0.6 : entry === hovered ? 1.45 : focused ? 1.32 : 1;
       const targetOpacity = dimmed ? 0.22 : 1;
 
-      entry.group.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.12);
+      entry.group.scale.lerp(scratchScale.setScalar(targetScale), 0.12);
       entry.sphere.material.opacity += (targetOpacity - entry.sphere.material.opacity) * 0.12;
       entry.halo.rotation.z = elapsed * 0.4 + entry.problem.index;
       entry.label.material.opacity = dimmed ? 0.25 : 0.95;

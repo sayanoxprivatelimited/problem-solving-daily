@@ -99,7 +99,10 @@ test('scenes load lazily so missing WebGL never blanks the page', () => {
   for (const scene of ['hero', 'galaxy', 'bars', 'structure']) {
     assert.match(main, new RegExp(`import\\('\\.\\/scenes\\/${scene}\\.js'\\)`));
   }
-  assert.match(main, /await Promise\.all\(/);
+  assert.match(main, /function bootWhenVisible/, 'each scene must wait for its canvas');
+  assert.match(main, /rootMargin: '400px 0px'/, 'boot slightly before the canvas is visible');
+  assert.match(main, /new IntersectionObserver/);
+  assert.doesNotMatch(main, /startScenes\(data\)/, 'scenes no longer boot all at once');
 });
 
 test('the import map is the single switch for where Three.js comes from', () => {
@@ -167,6 +170,19 @@ test('every problem carries the summary and rules the sheet renders', () => {
       `${problem.slug} has a rule that is too long for the sheet`,
     );
   }
+});
+
+test('the numbers written into index.html match the generated catalogue', () => {
+  const { stats } = JSON.parse(read('data/problems.json'));
+  const html = read('index.html');
+
+  assert.match(html, new RegExp(`<title>[^<]*${stats.problems} real problems`));
+  assert.match(
+    html,
+    new RegExp(`${stats.problems} problems, ${stats.categories} categories`),
+    'the catalogue heading must be data-driven',
+  );
+  assert.match(html, new RegExp(`${stats.tests} tests, ${stats.doctests} doctests`));
 });
 
 test('index.html loads the module entry point and the stylesheet', () => {
