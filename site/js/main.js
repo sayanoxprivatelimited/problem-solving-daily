@@ -13,10 +13,22 @@ import {
   prettyCategory,
   summarize,
 } from './layout.js';
-import { createBarsScene } from './scenes/bars.js';
-import { createGalaxyScene } from './scenes/galaxy.js';
-import { createHeroScene } from './scenes/hero.js';
-import { createStructureScene } from './scenes/structure.js';
+
+/**
+ * Every scene is imported lazily, on purpose.
+ *
+ * A scene pulls in Three.js, which is a ~1 MB module. If that request fails — an
+ * offline visitor, a blocked CDN, a browser with the feature switched off — a
+ * static import would take the whole entry point down with it and the page would
+ * render nothing. A dynamic import fails inside its own try/catch instead, so the
+ * catalogue below stays readable and only the canvases fall back to a note.
+ */
+const sceneModules = {
+  hero: () => import('./scenes/hero.js'),
+  galaxy: () => import('./scenes/galaxy.js'),
+  bars: () => import('./scenes/bars.js'),
+  structure: () => import('./scenes/structure.js'),
+};
 
 const state = {
   problems: [],
@@ -250,9 +262,9 @@ function tooltipHandlers() {
 }
 
 /* ---------------------------------------------------------------- scenes -- */
-function bootScene(name, factory) {
+async function bootScene(name, factory) {
   try {
-    return factory();
+    return await factory();
   } catch (error) {
     console.warn(`[${name}] scene unavailable:`, error);
     document.body.classList.add('no-webgl');
@@ -260,32 +272,40 @@ function bootScene(name, factory) {
   }
 }
 
-function startScenes(data) {
-  const heroCanvas = document.getElementById('hero-canvas');
-  bootScene('hero', () => createHeroScene(heroCanvas, state.problems));
-
-  const galaxyCanvas = document.getElementById('galaxy-canvas');
-  state.galaxy = bootScene('galaxy', () =>
-    createGalaxyScene(galaxyCanvas, state.problems, {
-      ...tooltipHandlers(),
-      onSelect: selectProblem,
+async function startScenes(data) {
+  await Promise.all([
+    bootScene('hero', async () => {
+      const { createHeroScene } = await sceneModules.hero();
+      return createHeroScene(document.getElementById('hero-canvas'), state.problems);
     }),
-  );
 
-  const barsCanvas = document.getElementById('bars-canvas');
-  bootScene('bars', () =>
-    createBarsScene(barsCanvas, state.problems, tooltipHandlers()),
-  );
-
-  const structureCanvas = document.getElementById('structure-canvas');
-  bootScene('structure', () =>
-    createStructureScene(structureCanvas, {
-      labels: ['problem.md', 'solution/', 'tests/'],
+    bootScene('galaxy', async () => {
+      const { createGalaxyScene } = await sceneModules.galaxy();
+      state.galaxy = createGalaxyScene(document.getElementById('galaxy-canvas'), state.problems, {
+        ...tooltipHandlers(),
+        onSelect: selectProblem,
+        // Cards can be filtered before the scene finishes loading.
+        initialFilter: state.category,
+      });
+      return state.galaxy;
     }),
-  );
 
-  // Filters also dim the galaxy once it exists.
-  state.galaxy?.setFilter(state.category);
+    bootScene('bars', async () => {
+      const { createBarsScene } = await sceneModules.bars();
+      return createBarsScene(
+        document.getElementById('bars-canvas'),
+        state.problems,
+        tooltipHandlers(),
+      );
+    }),
+
+    bootScene('structure', async () => {
+      const { createStructureScene } = await sceneModules.structure();
+      return createStructureScene(document.getElementById('structure-canvas'), {
+        labels: ['problem.md', 'solution/', 'tests/'],
+      });
+    }),
+  ]);
 }
 
 /* ------------------------------------------------------------------ init -- */
@@ -300,6 +320,8 @@ async function bootstrap() {
     renderFilters(data.categories);
     renderCards();
     renderNumbers(data);
+
+    // Deliberately not awaited: content is on screen before Three.js is downloaded.
     startScenes(data);
 
     // Escape clears a selection so keyboard users can leave "card focus" mode.

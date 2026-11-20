@@ -9,7 +9,7 @@
  * - device pixel ratio is capped at 2 (a 3x retina canvas is 9x the fragments)
  * - `prefers-reduced-motion` renders a single frame instead of an animation loop
  */
-import * as THREE from '../assets/three.module.js';
+import * as THREE from 'three';
 
 export function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;

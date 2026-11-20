@@ -4,7 +4,7 @@
  * Deliberately quiet: it is a section divider, not a feature. The point cloud on
  * the vertices makes the geometry readable without any lighting.
  */
-import * as THREE from '../../assets/three.module.js';
+import * as THREE from 'three';
 import { Stage, makeLabelTexture, prefersReducedMotion } from '../engine.js';
 
 export function createStructureScene(canvas, { labels = [] } = {}) {

@@ -86,3 +86,28 @@ node --test site/tests/*.test.mjs     # or: make site-test
 `assets/three.module.js` is Three.js r169, MIT licensed — see
 `assets/three-LICENSE.txt`. It is committed on purpose: no CDN, no `npm install`,
 no supply-chain surprise.
+
+Every module imports the bare specifier `three`, and `index.html` resolves it with
+an import map:
+
+```html
+<script type="importmap">
+  { "imports": { "three": "./assets/three.module.js" } }
+</script>
+```
+
+That single value is the seam between the two ways the site runs:
+
+| Where | How `three` resolves | Why |
+| --- | --- | --- |
+| `make serve` | `./assets/three.module.js` | offline, pinned bytes, no network |
+| `.site-dist/` | `https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js` | the upload bundle stays 73 KB instead of 1.4 MB |
+
+`python3 scripts/build_site_deploy.py` (or `make site-bundle`) writes that bundle
+to `.site-dist/`, copying the sources byte for byte and rewriting the import map
+plus the preload hint. The bundle is an artifact — `.site-dist/` is git-ignored,
+and `site/` remains the source of truth.
+
+Because the scenes are imported lazily, a failed `three` request costs the four
+canvases and nothing else: the cards, filters, stats and footer are already in the
+DOM, and the page switches to its `no-webgl` styles.

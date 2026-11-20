@@ -5,11 +5,11 @@
  * sectors, so the legend reads clockwise and a filter dims a whole sector at once.
  * Hovering raises a tooltip; clicking selects the node and the matching card.
  */
-import * as THREE from '../../assets/three.module.js';
+import * as THREE from 'three';
 import { Stage, addLights, makeLabelTexture } from '../engine.js';
 import { categoryColor, galaxyPositions, prettyCategory, starField } from '../layout.js';
 
-export function createGalaxyScene(canvas, problems, { onHover, onSelect } = {}) {
+export function createGalaxyScene(canvas, problems, { onHover, onSelect, initialFilter } = {}) {
   const stage = new Stage(canvas, { fov: 42, position: [0, 6.4, 9.6], lookAt: [0, 0, 0] });
   addLights(stage.scene, { intensity: 0.8 });
 
@@ -114,7 +114,8 @@ export function createGalaxyScene(canvas, problems, { onHover, onSelect } = {}) 
   let dragging = false;
   let lastX = 0;
   let idleSpin = 1;
-  let filter = 'all';
+  // The scene can finish loading after the visitor already picked a filter.
+  let filter = initialFilter ?? 'all';
   let focusedIndex = null;
 
   const setHover = (node) => {

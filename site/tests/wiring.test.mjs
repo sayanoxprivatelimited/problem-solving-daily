@@ -81,11 +81,49 @@ test('scenes only import helpers that engine.js exports', () => {
 
 test('every local import points at a file that exists', () => {
   for (const [file, source] of sources) {
-    for (const match of source.matchAll(/from '(\.[^']+)'/g)) {
-      const target = path.resolve(SITE, path.dirname(file), match[1]);
-      assert.ok(fs.existsSync(target), `${file} imports missing file ${match[1]}`);
+    for (const match of source.matchAll(/from '(\.[^']+)'|import\('(\.[^']+)'\)/g)) {
+      const specifier = match[1] ?? match[2];
+      const target = path.resolve(SITE, path.dirname(file), specifier);
+      assert.ok(fs.existsSync(target), `${file} imports missing file ${specifier}`);
     }
   }
+});
+
+test('scenes load lazily so missing WebGL never blanks the page', () => {
+  const main = read('js/main.js');
+  assert.doesNotMatch(
+    main,
+    /^import .*from '\.\/scenes\//m,
+    'main.js must not statically import a scene: Three.js would gate first paint',
+  );
+  for (const scene of ['hero', 'galaxy', 'bars', 'structure']) {
+    assert.match(main, new RegExp(`import\\('\\.\\/scenes\\/${scene}\\.js'\\)`));
+  }
+  assert.match(main, /await Promise\.all\(/);
+});
+
+test('the import map is the single switch for where Three.js comes from', () => {
+  const html = read('index.html');
+  const map = html.match(/<script type="importmap">([\s\S]*?)<\/script>/);
+  assert.ok(map, 'index.html must declare an import map');
+
+  const imports = JSON.parse(map[1]).imports;
+  assert.ok(imports.three, 'the import map must resolve the bare specifier "three"');
+
+  // Local development points at the vendored build; scripts/build_site_deploy.py
+  // rewrites this one value to a pinned CDN copy for the Vercel upload.
+  const vendored = path.resolve(SITE, imports.three);
+  assert.ok(fs.existsSync(vendored), `import map points at a missing file: ${imports.three}`);
+
+  for (const [file, source] of sources) {
+    assert.doesNotMatch(
+      source,
+      /from '(\.[^']*\/)?assets\/three\.module\.js'/,
+      `${file} must import 'three', not the asset path directly`,
+    );
+  }
+  const threeUsers = [...sources.values()].filter((source) => /from 'three'/.test(source));
+  assert.equal(threeUsers.length, 5, 'engine.js and all four scenes share one Three.js instance');
 });
 
 test('every DOM id used by main.js exists in index.html', () => {

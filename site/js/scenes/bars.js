@@ -4,7 +4,7 @@
  * Height comes from `barLayout`, colour from the category. Every bar carries its
  * own value label, so the chart still communicates without hovering.
  */
-import * as THREE from '../../assets/three.module.js';
+import * as THREE from 'three';
 import { Stage, addLights, makeLabelTexture } from '../engine.js';
 import { barLayout } from '../layout.js';
 

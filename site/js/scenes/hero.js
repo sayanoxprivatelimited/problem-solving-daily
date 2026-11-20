@@ -4,7 +4,7 @@
  * A tunnel of instanced cubes flying towards the camera, one colour per category.
  * It reads as "streams of problems flowing past", and it costs one draw call.
  */
-import * as THREE from '../../assets/three.module.js';
+import * as THREE from 'three';
 import { Stage, addLights } from '../engine.js';
 import { categoryColor, starField } from '../layout.js';
 
