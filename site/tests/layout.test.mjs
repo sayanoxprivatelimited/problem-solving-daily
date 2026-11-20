@@ -20,6 +20,7 @@ import {
   galaxyPositions,
   groupByCategory,
   labelOffset,
+  matchesQuery,
   prettyCategory,
   starField,
   stepIndex,
@@ -146,4 +147,53 @@ test('filterProblems keeps catalogue order', () => {
 test('labelOffset lifts hard problems a little higher', () => {
   assert.ok(labelOffset({ level: 'hard' }) > labelOffset({ level: 'medium' }));
   assert.equal(labelOffset({}), 0.62);
+});
+
+test('matchesQuery finds a problem by any field it shows', () => {
+  const bpe = {
+    index: 1,
+    slug: '01-bpe-tokenizer',
+    category: 'ai',
+    level: 'hard',
+    title: 'Byte-pair encoding tokenizer from scratch',
+    concepts: ['tokenization', 'BPE', 'vocabularies'],
+    criteria: ['decode(encode(text)) == text'],
+    summary: 'Every tokenizer bug is a silent one.',
+  };
+  const retrieval = { ...bpe, index: 2, slug: '02-retrieval', title: 'Retrieval step for a docs assistant' };
+
+  assert.equal(matchesQuery(bpe, ''), true, 'an empty query matches everything');
+  assert.equal(matchesQuery(bpe, '   '), true);
+  assert.equal(matchesQuery(bpe, 'TOKEN'), true, 'case-insensitive');
+  assert.equal(matchesQuery(bpe, 'bpe'), true, 'matches a concept');
+  assert.equal(matchesQuery(bpe, 'hard'), true, 'matches the level');
+  assert.equal(matchesQuery(bpe, 'ai'), true, 'matches the category');
+  assert.equal(matchesQuery(bpe, 'silent'), true, 'matches the summary');
+
+  assert.equal(matchesQuery(bpe, 'retrieval'), false);
+  assert.equal(matchesQuery(retrieval, 'retrieval'), true);
+  assert.equal(matchesQuery(retrieval, 'docs assistant'), true);
+  assert.equal(matchesQuery(retrieval, 'docs nonsense'), false);
+});
+
+test('matchesQuery requires every token, in any order', () => {
+  const problem = {
+    title: 'Clean a messy sales export',
+    level: 'medium',
+    category: 'data',
+    concepts: ['CSV parsing', 'Decimal money math'],
+    criteria: ['Blank cells reject the row'],
+    summary: 'Amounts are typed the way humans type them.',
+  };
+
+  assert.equal(matchesQuery(problem, 'csv decimal'), true);
+  assert.equal(matchesQuery(problem, 'decimal csv'), true);
+  assert.equal(matchesQuery(problem, 'csv nginx'), false);
+  assert.equal(matchesQuery(problem, 'humans'), true, 'matches the summary');
+  assert.equal(matchesQuery(problem, 'reject'), true, 'matches a rule');
+});
+
+test('matchesQuery tolerates a problem without the new fields', () => {
+  assert.equal(matchesQuery({ title: 'CIDR planner', category: 'network' }, 'planner'), true);
+  assert.equal(matchesQuery({ title: 'CIDR planner', category: 'network' }, 'subnet'), false);
 });

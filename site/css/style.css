@@ -842,3 +842,312 @@ p {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* ------------------------------------------------------- theme switch ---- */
+.nav__theme {
+  display: inline-grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(13, 19, 33, 0.6);
+  color: var(--ink);
+  font-size: 0.86rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.nav__theme:hover,
+.nav__theme:focus-visible {
+  border-color: rgba(139, 92, 246, 0.7);
+  transform: translateY(-1px);
+}
+
+/* ------------------------------------------------------------- search ---- */
+.catalog-tools {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: start;
+  min-width: min(22rem, 100%);
+}
+
+.search {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(13, 19, 33, 0.6);
+  color: var(--muted);
+}
+
+.search:focus-within {
+  border-color: rgba(139, 92, 246, 0.65);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.14);
+}
+
+.search__icon {
+  font-size: 0.92rem;
+}
+
+.search__input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+}
+
+.search__input:focus {
+  outline: none;
+}
+
+.search__input::placeholder {
+  color: var(--faint);
+}
+
+.result-count {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--faint);
+}
+
+.card__summary {
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card__more {
+  margin-left: auto;
+  padding: 0.1rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  cursor: pointer;
+  transition: color 0.16s ease, border-color 0.16s ease;
+}
+
+.card__more:hover,
+.card__more:focus-visible {
+  color: var(--ink);
+  border-color: var(--cat, var(--accent));
+}
+
+.card__foot a {
+  margin-left: 0;
+}
+
+.card--empty {
+  border-left-color: var(--line);
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent-2);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* -------------------------------------------------------------- sheet ---- */
+.sheet {
+  width: min(38rem, calc(100vw - 2rem));
+  max-height: min(78vh, 40rem);
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, rgba(17, 24, 40, 0.98), rgba(9, 13, 24, 0.98));
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  overflow: auto;
+}
+
+.sheet::backdrop {
+  background: rgba(3, 6, 15, 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.sheet__inner {
+  display: grid;
+  gap: 0.65rem;
+  padding: 1.4rem 1.5rem 1.6rem;
+}
+
+.sheet__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.sheet__close {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.sheet__close:hover,
+.sheet__close:focus-visible {
+  color: var(--ink);
+  border-color: rgba(139, 92, 246, 0.7);
+}
+
+.sheet h2 {
+  font-size: clamp(1.15rem, 2.4vw, 1.5rem);
+}
+
+.sheet__meta {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--faint);
+}
+
+.sheet__summary {
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+.sheet__label {
+  margin-top: 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.sheet__criteria {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.86rem;
+  color: var(--ink);
+}
+
+.sheet__criteria li::marker {
+  color: var(--accent-2);
+}
+
+.sheet__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 0.8rem;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+}
+
+.sheet__foot a {
+  color: var(--accent-2);
+}
+
+.sheet__foot a:hover {
+  text-decoration: underline;
+}
+
+/* --------------------------------------------------------- light theme ---- */
+html[data-theme="light"] {
+  --bg: #f5f7fc;
+  --bg-soft: #eef2fa;
+  --panel: rgba(255, 255, 255, 0.86);
+  --panel-solid: #ffffff;
+  --ink: #131a2b;
+  --muted: #4a5a75;
+  --faint: #6b7a94;
+  --line: rgba(19, 26, 43, 0.14);
+  --shadow: 0 20px 50px rgba(19, 26, 43, 0.12);
+}
+
+html[data-theme="light"] body {
+  background:
+    radial-gradient(1100px 560px at 80% -10%, rgba(139, 92, 246, 0.12), transparent 62%),
+    radial-gradient(900px 520px at 6% 10%, rgba(34, 211, 238, 0.12), transparent 58%),
+    linear-gradient(180deg, #f7f9fd 0%, #eef2fa 46%, #f7f9fd 100%);
+}
+
+html[data-theme="light"] body::before {
+  background-image:
+    linear-gradient(rgba(19, 26, 43, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(19, 26, 43, 0.05) 1px, transparent 1px);
+}
+
+html[data-theme="light"] .nav {
+  background: rgba(247, 249, 253, 0.78);
+}
+
+html[data-theme="light"] .nav__theme,
+html[data-theme="light"] .search,
+html[data-theme="light"] .filter,
+html[data-theme="light"] .legend li,
+html[data-theme="light"] .button--ghost {
+  background: rgba(255, 255, 255, 0.75);
+}
+
+html[data-theme="light"] .card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(246, 249, 255, 0.95));
+}
+
+html[data-theme="light"] .card:hover,
+html[data-theme="light"] .card:focus-within {
+  background: #ffffff;
+}
+
+html[data-theme="light"] .filter[aria-pressed="true"] {
+  color: #ffffff;
+}
+
+html[data-theme="light"] .sheet {
+  background: #ffffff;
+}
+
+html[data-theme="light"] .sheet::backdrop {
+  background: rgba(19, 26, 43, 0.35);
+}
+
+/* The scenes are lit for a dark page; on a light one they read as texture only. */
+html[data-theme="light"] .scene {
+  opacity: 0.55;
+}
+
+html[data-theme="light"] .galaxy,
+html[data-theme="light"] .bars,
+html[data-theme="light"] .how-scene {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+html[data-theme="light"] .footer {
+  background: rgba(247, 249, 253, 0.8);
+}
+
+html[data-theme="light"] .tooltip {
+  background: rgba(255, 255, 255, 0.97);
+  border-color: rgba(19, 26, 43, 0.14);
+}
+
+@media (max-width: 980px) {
+  .catalog-tools {
+    width: 100%;
+  }
+}

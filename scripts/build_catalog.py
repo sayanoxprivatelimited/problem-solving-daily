@@ -33,6 +33,30 @@ TEST_DEFINITION = re.compile(r"^\s*def test_\w+\(", re.MULTILINE)
 DOCTEST_PROMPT = re.compile(r"^\s*>>> ", re.MULTILINE)
 
 REQUIRED_KEYS = ("title", "category", "level", "concepts", "status")
+
+# The briefs are prose, but every one of them opens with a Context section and
+# then states what must hold. Those two are what a reader wants before the code,
+# so the catalogue lifts them into the generated data instead of making the page
+# scrape markdown it never sees.
+SECTION_HEADING = re.compile(r"^##\s+(.+?)\s*$", re.MULTILINE)
+LIST_ITEM = re.compile(r"^\s*(?:\d+\.|[-*])\s+(.+?)\s*$", re.MULTILINE)
+INLINE_CODE = re.compile(r"`([^`]+)`")
+BOLD = re.compile(r"\*\*([^*]+)\*\*")
+MD_LINK = re.compile(r"\[([^\]]+)\]\([^)]*\)")
+
+SUMMARY_HEADINGS = ("context", "the problem", "behaviour", "behavior")
+CRITERIA_HEADINGS = (
+    "requirements",
+    "business rules",
+    "constraints & acceptance criteria",
+    "acceptance criteria",
+    "behaviour",
+    "behavior",
+)
+
+SUMMARY_LIMIT = 220
+CRITERIA_LIMIT = 4
+CRITERION_LIMIT = 130
 LEVEL_BADGES = {"easy": "🟢 easy", "medium": "🟡 medium", "hard": "🔴 hard"}
 STATUS_BADGES = {"solved": "✅ solved", "todo": "⏳ todo", "wip": "🚧 wip"}
 
@@ -88,8 +112,112 @@ class Problem:
     def concepts(self) -> list[str]:
         return [item.strip() for item in self.meta.get("concepts", "").split(",") if item.strip()]
 
+    @property
+    def brief(self) -> str:
+        path = self.path / "problem.md"
+        return path.read_text(encoding="utf-8") if path.is_file() else ""
+
+    @property
+    def summary(self) -> str:
+        """First paragraph of the Context section — one line a card can show."""
+        found = sections(self.brief)
+        paragraph = first_paragraph(pick_section(found, SUMMARY_HEADINGS))
+        if not paragraph:
+            paragraph = first_paragraph(self.brief)
+        return shorten(paragraph, SUMMARY_LIMIT)
+
+    @property
+    def criteria(self) -> list[str]:
+        """The first few rules from the requirements/rules section.
+
+        Briefs state those either as a table (`| # | Requirement | Why |`) or as
+        bullets, so both shapes are read; wrapped lines are joined first.
+        """
+        body = pick_section(sections(self.brief), CRITERIA_HEADINGS)
+        rows = table_rows(body)
+        entries = [row[1] for row in rows[1:]] if len(rows) > 1 else list_items(body)
+        items = [shorten(entry, CRITERION_LIMIT) for entry in entries]
+        return [item for item in items if item][:CRITERIA_LIMIT]
+
     def blob_url(self, relative_path: str) -> str:
         return f"{REPOSITORY_URL}/blob/{DEFAULT_BRANCH}/{self.path.relative_to(ROOT)}/{relative_path}"
+
+
+def plain(text: str) -> str:
+    """Strip the inline markdown a canvas texture or a card should not show."""
+    text = MD_LINK.sub(r"\1", text)
+    text = BOLD.sub(r"\1", text)
+    text = INLINE_CODE.sub(r"\1", text)
+    return " ".join(text.split())
+
+
+def shorten(text: str, limit: int) -> str:
+    """Collapse whitespace and cut on a word boundary, with an ellipsis."""
+    collapsed = plain(text)
+    if len(collapsed) <= limit:
+        return collapsed
+    cut = collapsed[:limit].rsplit(" ", 1)[0].rstrip(",;:—-")
+    return f"{cut}…"
+
+
+def sections(markdown: str) -> dict[str, str]:
+    """Map lowercased `## Heading` to the text under it."""
+    matches = list(SECTION_HEADING.finditer(markdown))
+    found: dict[str, str] = {}
+    for index, match in enumerate(matches):
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(markdown)
+        found.setdefault(match.group(1).strip().lower(), markdown[match.end():end])
+    return found
+
+
+def first_paragraph(body: str) -> str:
+    for block in re.split(r"\n\s*\n", body):
+        stripped = block.strip()
+        if stripped and not stripped.startswith(("```", "|", "#")):
+            return stripped
+    return ""
+
+
+def table_rows(body: str) -> list[list[str]]:
+    """Rows of the first markdown table in `body`, header included."""
+    rows: list[list[str]] = []
+    for line in body.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if len(cells) < 2 or all(set(cell) <= set("-: ") for cell in cells):
+            continue
+        rows.append(cells)
+    return rows
+
+
+def list_items(body: str) -> list[str]:
+    """Bullet/numbered items, with wrapped continuation lines joined back on."""
+    items: list[str] = []
+    current: str | None = None
+    for line in body.splitlines():
+        match = LIST_ITEM.match(line)
+        if match:
+            if current:
+                items.append(current)
+            current = match.group(1)
+        elif current is not None:
+            if line.strip():
+                current += " " + line.strip()
+            else:
+                items.append(current)
+                current = None
+    if current:
+        items.append(current)
+    return items
+
+
+def pick_section(found: dict[str, str], headings: tuple[str, ...]) -> str:
+    for heading in headings:
+        if heading in found:
+            return found[heading]
+    return ""
 
 
 def parse_front_matter(text: str) -> dict[str, str]:
@@ -238,6 +366,8 @@ def site_payload(problems: list[Problem]) -> dict:
                 "level": problem.meta.get("level", "medium"),
                 "status": problem.meta.get("status", "todo"),
                 "concepts": problem.concepts,
+                "summary": problem.summary,
+                "criteria": problem.criteria,
                 "tests": problem.tests,
                 "doctests": problem.doctests,
                 "solution_lines": problem.solution_lines,

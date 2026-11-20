@@ -11,7 +11,7 @@ assumptions — because that is the part that is hard in real work.
 
 **9 problems · 253 tests · 40 doctests · 6 categories · zero dependencies** (Python 3.10+)
 
-There is also a **3D showcase site** — four WebGL scenes built from the same data,
+There is also a **3D showcase (search, detail sheet, light/dark theme) site** — four WebGL scenes built from the same data,
 no build step, no CDN: `make serve` → <http://localhost:8000>.
 
 ---

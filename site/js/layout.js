@@ -166,6 +166,34 @@ export function stepIndex(length, current, direction) {
   return (start + direction + length) % length;
 }
 
+/**
+ * Case-insensitive, all-tokens-must-match search over everything a card shows.
+ *
+ * Every token has to appear somewhere in the haystack, so "csv decimal" finds the
+ * messy-export problem without the query having to be in any particular order.
+ */
+export function matchesQuery(problem, query) {
+  const tokens = String(query ?? '')
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (!tokens.length) return true;
+
+  const haystack = [
+    problem.title,
+    problem.category,
+    problem.level,
+    problem.slug,
+    problem.summary ?? '',
+    ...(problem.concepts ?? []),
+    ...(problem.criteria ?? []),
+  ]
+    .join(' ')
+    .toLowerCase();
+
+  return tokens.every((token) => haystack.includes(token));
+}
+
 /** Problems matching a filter, keeping the catalogue order. */
 export function filterProblems(problems, category) {
   if (!category || category === 'all') return problems.slice();

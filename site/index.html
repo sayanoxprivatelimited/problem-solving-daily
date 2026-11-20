@@ -17,6 +17,15 @@
         }
       }
     </script>
+    <script>
+      // Applied before first paint so a light-theme visitor never sees the dark flash.
+      try {
+        const stored = localStorage.getItem('psd-theme');
+        if (stored === 'light' || stored === 'dark') document.documentElement.dataset.theme = stored;
+      } catch (error) {
+        /* private mode, blocked storage: fall back to the default palette */
+      }
+    </script>
   </head>
   <body>
     <a class="skip-link" href="#catalog">Skip to the catalogue</a>
@@ -31,6 +40,8 @@
         <a href="#numbers">Numbers</a>
         <a href="#how">How it works</a>
       </nav>
+      <button class="nav__theme" id="theme-toggle" type="button" aria-pressed="false"
+        aria-label="Switch to light theme">☀</button>
       <a class="nav__cta" id="repo-link" href="#" rel="noreferrer">GitHub ↗</a>
     </header>
 
@@ -80,7 +91,16 @@
               its card. Filter a category to dim the rest of the galaxy.
             </p>
           </div>
-          <div class="filters" id="filters" role="group" aria-label="Filter by category"></div>
+          <div class="catalog-tools">
+            <label class="search" for="search">
+              <span class="search__icon" aria-hidden="true">⌕</span>
+              <input class="search__input" id="search" type="search" name="search"
+                placeholder="Search title, concept or rule…" autocomplete="off"
+                aria-describedby="result-count" />
+            </label>
+            <div class="filters" id="filters" role="group" aria-label="Filter by category"></div>
+            <p class="result-count" id="result-count" role="status" aria-live="polite"></p>
+          </div>
         </div>
 
         <div class="catalog">
@@ -169,6 +189,21 @@ python scripts/new_problem.py ai "Eval harness" --level hard</code></pre>
         <p class="footer__meta" id="footer-meta"></p>
       </div>
     </footer>
+
+    <dialog class="sheet" id="detail" aria-labelledby="detail-title">
+      <div class="sheet__inner">
+        <header class="sheet__head">
+          <span class="badge" id="detail-category"></span>
+          <button class="sheet__close" id="detail-close" type="button" aria-label="Close">✕</button>
+        </header>
+        <h2 id="detail-title"></h2>
+        <p class="sheet__meta" id="detail-meta"></p>
+        <p class="sheet__summary" id="detail-summary"></p>
+        <h3 class="sheet__label" id="detail-rules-label">What has to hold</h3>
+        <ul class="sheet__criteria" id="detail-criteria" aria-labelledby="detail-rules-label"></ul>
+        <footer class="sheet__foot" id="detail-links"></footer>
+      </div>
+    </dialog>
 
     <div class="tooltip" id="tooltip" role="status" aria-live="polite" hidden></div>
 

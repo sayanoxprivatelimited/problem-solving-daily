@@ -137,6 +137,38 @@ test('every DOM id used by main.js exists in index.html', () => {
   assert.deepEqual(missing, [], `main.js references missing ids: ${missing.join(', ')}`);
 });
 
+test('the page ships the search, theme and detail controls it wires up', () => {
+  const html = read('index.html');
+  for (const id of [
+    'search',
+    'result-count',
+    'theme-toggle',
+    'detail',
+    'detail-title',
+    'detail-criteria',
+    'detail-links',
+    'detail-close',
+  ]) {
+    assert.match(html, new RegExp(`id="${id}"`), `index.html is missing #${id}`);
+  }
+  assert.match(html, /<dialog[^>]*id="detail"/, 'the detail sheet must be a dialog');
+  // The stored theme has to be applied before first paint, or light users flash dark.
+  assert.match(html, /localStorage\.getItem\('psd-theme'\)/);
+  assert.match(read('js/main.js'), /localStorage\.setItem\(THEME_KEY/);
+});
+
+test('every problem carries the summary and rules the sheet renders', () => {
+  const data = JSON.parse(read('data/problems.json'));
+  for (const problem of data.problems) {
+    assert.ok(problem.summary?.length > 20, `${problem.slug} has no summary`);
+    assert.ok(problem.criteria.length > 0, `${problem.slug} has no criteria`);
+    assert.ok(
+      problem.criteria.every((rule) => rule.length <= 140),
+      `${problem.slug} has a rule that is too long for the sheet`,
+    );
+  }
+});
+
 test('index.html loads the module entry point and the stylesheet', () => {
   const html = read('index.html');
   assert.match(html, /<script type="module" src="js\/main\.js"><\/script>/);

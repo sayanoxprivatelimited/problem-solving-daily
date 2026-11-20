@@ -11,7 +11,9 @@ import {
   colorToCss,
   filterProblems,
   formatNumber,
+  matchesQuery,
   prettyCategory,
+  stepIndex,
   summarize,
 } from './layout.js';
 
@@ -31,14 +33,19 @@ const sceneModules = {
   structure: () => import('./scenes/structure.js'),
 };
 
+const THEME_KEY = 'psd-theme';
+
 const state = {
   problems: [],
   category: 'all',
+  query: '',
   selected: null,
   galaxy: null,
+  theme: 'dark',
 };
 
 const tooltip = document.getElementById('tooltip');
+const sheet = document.getElementById('detail');
 
 /* ------------------------------------------------------------------ data -- */
 /**
@@ -143,14 +150,26 @@ function renderFilters(categories) {
   });
 }
 
-function renderCards() {
-  const container = document.getElementById('cards');
-  const visible = filterProblems(state.problems, state.category);
+function visibleProblems() {
+  return filterProblems(state.problems, state.category).filter((problem) =>
+    matchesQuery(problem, state.query),
+  );
+}
 
-  container.innerHTML = visible
-    .map((problem) => {
-      const color = colorToCss(categoryColor(problem.category));
-      return `
+function updateCount(visible) {
+  const counter = document.getElementById('result-count');
+  if (!counter) return;
+  const total = state.problems.length;
+  const scope = state.query ? ` matching “${state.query}”` : '';
+  counter.textContent =
+    visible.length === total
+      ? `${total} problems${scope}`
+      : `${visible.length} of ${total} problems${scope}`;
+}
+
+function cardMarkup(problem) {
+  const color = colorToCss(categoryColor(problem.category));
+  return `
         <article class="card" style="--cat: ${color}" data-index="${problem.index}">
           <header class="card__head">
             <span class="card__index">${String(problem.index).padStart(2, '0')}</span>
@@ -160,15 +179,35 @@ function renderCards() {
           <h3 class="card__title">
             <a href="${problem.brief_url}" target="_blank" rel="noreferrer">${problem.title}</a>
           </h3>
+          <p class="card__summary">${problem.summary ?? ''}</p>
           <p class="card__concepts">${problem.concepts.join(' · ')}</p>
           <footer class="card__foot">
             <span>${problem.tests} tests</span>
             <span>${problem.doctests} doctests</span>
+            <button class="card__more" type="button" data-detail="${problem.index}">Details</button>
             <a href="${problem.code_url}" target="_blank" rel="noreferrer">code ↗</a>
           </footer>
         </article>`;
-    })
-    .join('');
+}
+
+function renderCards() {
+  const container = document.getElementById('cards');
+  const visible = visibleProblems();
+  updateCount(visible);
+
+  if (!visible.length) {
+    container.innerHTML = `
+      <div class="card card--empty">
+        <h3 class="card__title">Nothing matches that</h3>
+        <p class="card__concepts">
+          Try a concept like <code>regex</code>, a level like <code>hard</code>, or
+          <button class="link-button" type="button" data-clear>clear the filters</button>.
+        </p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = visible.map(cardMarkup).join('');
 
   for (const card of container.querySelectorAll('.card[data-index]')) {
     const index = Number(card.dataset.index);
@@ -247,6 +286,106 @@ function setCategory(category) {
   state.galaxy?.setFilter(category);
 }
 
+/* ---------------------------------------------------------------- sheet -- */
+function openDetail(index) {
+  const problem = state.problems.find((entry) => entry.index === index);
+  if (!problem) return;
+
+  const category = document.getElementById('detail-category');
+  const title = document.getElementById('detail-title');
+  const meta = document.getElementById('detail-meta');
+  const summary = document.getElementById('detail-summary');
+  const rules = document.getElementById('detail-criteria');
+  const links = document.getElementById('detail-links');
+
+  if (category) category.textContent = prettyCategory(problem.category);
+  if (title) title.textContent = problem.title;
+  if (meta) {
+    meta.textContent =
+      `${problem.level} · ${problem.tests} tests · ${problem.doctests} doctests`
+      + ` · ${problem.solution_lines} lines of solution`;
+  }
+  if (summary) summary.textContent = problem.summary ?? '';
+
+  // Built as nodes, not innerHTML: the rules come from markdown and may contain
+  // characters that would otherwise be read as markup.
+  if (rules) {
+    rules.replaceChildren(
+      ...(problem.criteria ?? []).map((rule) => {
+        const item = document.createElement('li');
+        item.textContent = rule;
+        return item;
+      }),
+    );
+  }
+
+  if (links) {
+    links.replaceChildren(
+      ...[
+        ['Read the brief ↗', problem.brief_url],
+        ['Solution ↗', problem.code_url],
+      ].map(([label, href]) => {
+        const link = document.createElement('a');
+        link.href = href;
+        link.target = '_blank';
+        link.rel = 'noreferrer';
+        link.textContent = label;
+        return link;
+      }),
+    );
+  }
+
+  state.selected = problem.index;
+  paintSelection(problem.index);
+  state.galaxy?.focus(problem.index);
+
+  if (sheet && typeof sheet.showModal === 'function') {
+    if (!sheet.open) sheet.showModal();
+  } else if (sheet) {
+    sheet.setAttribute('open', '');
+  }
+}
+
+function closeDetail() {
+  if (!sheet) return;
+  if (typeof sheet.close === 'function' && sheet.open) sheet.close();
+  else sheet.removeAttribute('open');
+}
+
+/* ---------------------------------------------------------------- theme -- */
+function applyTheme(theme) {
+  state.theme = theme === 'light' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = state.theme;
+
+  const button = document.getElementById('theme-toggle');
+  if (!button) return;
+  const light = state.theme === 'light';
+  button.textContent = light ? '☾' : '☀';
+  button.setAttribute('aria-pressed', String(light));
+  button.setAttribute('aria-label', light ? 'Switch to dark theme' : 'Switch to light theme');
+}
+
+function initTheme() {
+  let stored = null;
+  try {
+    stored = localStorage.getItem(THEME_KEY);
+  } catch (error) {
+    stored = null; // storage can be blocked; the OS preference still applies
+  }
+  const prefersLight = window.matchMedia?.('(prefers-color-scheme: light)').matches ?? false;
+  applyTheme(stored ?? (prefersLight ? 'light' : 'dark'));
+
+  document.getElementById('theme-toggle')?.addEventListener('click', () => {
+    const next = state.theme === 'light' ? 'dark' : 'light';
+    applyTheme(next);
+    try {
+      localStorage.setItem(THEME_KEY, next);
+    } catch (error) {
+      /* nothing to save, the choice still holds for this visit */
+    }
+  });
+}
+
 /* --------------------------------------------------------------- tooltip -- */
 function showTooltip(problem, point) {
   if (!problem || !point) {
@@ -317,6 +456,32 @@ async function startScenes(data) {
   ]);
 }
 
+function clearFilters() {
+  state.query = '';
+  const input = document.getElementById('search');
+  if (input) input.value = '';
+  setCategory('all');
+}
+
+/** Move the selection through the cards currently on screen, wrapping at both ends. */
+function moveSelection(direction) {
+  const buttons = [...document.querySelectorAll('.card[data-index] .card__more')];
+  if (!buttons.length) return;
+
+  const current = buttons.findIndex(
+    (button) => Number(button.closest('.card').dataset.index) === state.selected,
+  );
+  const next = stepIndex(buttons.length, current, direction);
+  const target = buttons[next];
+  if (!target) return;
+
+  const index = Number(target.closest('.card').dataset.index);
+  state.selected = index;
+  paintSelection(index);
+  state.galaxy?.focus(index);
+  target.focus();
+}
+
 /* ------------------------------------------------------------------ init -- */
 async function bootstrap() {
   try {
@@ -329,17 +494,49 @@ async function bootstrap() {
     renderFilters(data.categories);
     renderCards();
     renderNumbers(data);
+    initTheme();
+
+    const search = document.getElementById('search');
+    search?.addEventListener('input', () => {
+      state.query = search.value.trim();
+      renderCards();
+    });
+
+    document.getElementById('detail-close')?.addEventListener('click', closeDetail);
+    sheet?.addEventListener('click', (event) => {
+      if (event.target === sheet) closeDetail(); // clicking the backdrop closes it
+    });
+
+    document.getElementById('cards')?.addEventListener('click', (event) => {
+      if (!(event.target instanceof Element)) return;
+      const details = event.target.closest('button[data-detail]');
+      if (details) openDetail(Number(details.dataset.detail));
+      else if (event.target.closest('[data-clear]')) clearFilters();
+    });
 
     // Deliberately not awaited: content is on screen before Three.js is downloaded.
     startScenes(data);
 
-    // Escape clears a selection so keyboard users can leave "card focus" mode.
+    // Keyboard users walk the visible cards without touching the mouse.
     window.addEventListener('keydown', (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      if (target?.closest('input, textarea, select')) return;
+
       if (event.key === 'Escape') {
         state.selected = null;
         paintSelection(null);
         state.galaxy?.focus(null);
         hideTooltip();
+        closeDetail();
+        return;
+      }
+      if (event.key === 'ArrowDown' || event.key === 'j') {
+        event.preventDefault();
+        moveSelection(1);
+      }
+      if (event.key === 'ArrowUp' || event.key === 'k') {
+        event.preventDefault();
+        moveSelection(-1);
       }
     });
   } catch (error) {
