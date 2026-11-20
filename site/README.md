@@ -21,11 +21,25 @@ The page needs to be served over HTTP (ES modules and `fetch` do not work from
 | **Test coverage bars** | `#numbers` | 3D bar chart of tests per problem, height from `barLayout`, drag to spin, hover for the title |
 | **Structure** | `#how` | slow wireframe icosahedron with the three workflow labels pinned around it |
 
+## What the page does
+
+| Interaction | Where | Notes |
+| --- | --- | --- |
+| Search | catalogue header | every whitespace-separated token must appear in the title, category, level, concepts, summary or rules |
+| Category filter | catalogue header | dims the matching sector of the galaxy |
+| Details | each card | a `<dialog>` sheet: summary, the first four rules from the brief, links to `problem.md` and `solution/main.py` |
+| Hover / click a node | galaxy | tooltip, then selects the matching card |
+| Keyboard | anywhere | `j` / `↓` and `k` / `↑` walk the visible cards, `Esc` clears the selection and closes the sheet |
+| Theme | navigation bar | light / dark, remembered in `localStorage`, applied before first paint by an inline script |
+
 ## Data comes from the repository, not from the page
 
 `site/data/catalog.js` is **generated** by `scripts/build_catalog.py`, which reads
-the front matter of every `problems/**/problem.md` and counts tests, doctests and
-solution lines. So the site can never advertise a problem that does not exist, or a
+the front matter of every `problems/**/problem.md`, counts tests, doctests and
+solution lines, and lifts two pieces of prose out of the brief: `summary` (first
+paragraph of *Context*) and `criteria` (the first four rows of *Requirements*, or
+of *Business rules* / *Constraints & acceptance criteria* when a brief uses those
+headings instead). So the site can never advertise a problem that does not exist, or a
 test count that is wrong:
 
 ```bash

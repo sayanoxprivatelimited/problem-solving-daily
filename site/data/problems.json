@@ -64,6 +64,13 @@
         "tie-breaking",
         "lossless round-trip"
       ],
+      "summary": "Every LLM pipeline starts with a tokenizer, and every tokenizer bug is a silent one: text goes in, token ids come out, and a *different* text comes back. You cannot debug a model whose inputs you cannot reproduce.",
+      "criteria": [
+        "decode(encode(text)) == text for NL, punctuation, runs of spaces, newlines, Unicode",
+        "Whitespace is part of a token, not a separator that gets normalised away",
+        "Training is deterministic: same corpus + same vocab_size → identical merges",
+        "Merge ranks matter: the lowest-ranked applicable pair is merged first"
+      ],
       "tests": 21,
       "doctests": 5,
       "solution_lines": 369,
@@ -84,6 +91,13 @@
         "cosine similarity",
         "citations",
         "determinism"
+      ],
+      "summary": "A support assistant answers from your documentation. Before any model is involved, something has to find the right paragraphs — and every answer must cite the exact place it came from, or support cannot verify it.",
+      "criteria": [
+        "Chunks never exceed size characters and overlap by overlap characters",
+        "Cuts prefer sentence boundaries, then whitespace, then a hard cut",
+        "chunk.citation + start/end must slice the original text exactly",
+        "Empty/whitespace text → no chunks; 0 <= overlap < size enforced"
       ],
       "tests": 30,
       "doctests": 4,
@@ -106,6 +120,13 @@
         "LRU eviction",
         "testable time"
       ],
+      "summary": "Your API is being hammered — sometimes by a buggy client in a retry loop, sometimes by a scraper. You need an in-process limiter: a client may burst up to capacity requests instantly, then gets refill_rate requests per…",
+      "criteria": [
+        "Burst of capacity, then refill at refill_rate per second",
+        "retry_after = time until this request would fit",
+        "Refill never exceeds capacity",
+        "Injectable clock, no time.sleep in tests"
+      ],
       "tests": 18,
       "doctests": 5,
       "solution_lines": 227,
@@ -127,6 +148,13 @@
         "manifests",
         "path traversal"
       ],
+      "summary": "Someone's Downloads folder: 900 files, mixed extensions, three copies of report.pdf, and no folders. They want it sorted — but they do not want to find out afterwards that something was mangled.",
+      "criteria": [
+        "--dry-run prints the same plan organize would execute, and touches nothing",
+        "Collisions rename instead of overwrite: report.pdf → report (1).pdf",
+        "A JSON manifest records every move so --undo can reverse them",
+        "Second run does not clobber the manifest from the first run"
+      ],
       "tests": 29,
       "doctests": 4,
       "solution_lines": 271,
@@ -147,6 +175,13 @@
         "cycle reporting",
         "incremental builds"
       ],
+      "summary": "A monorepo has 40 packages with a dependency graph nobody fully understands. CI must build them in an order that never builds a package before its dependencies, must stop with a *useful* error when someone introduces a…",
+      "criteria": [
+        "Dependencies always come before dependents",
+        "Independent packages are ordered alphabetically",
+        "A cycle raises DependencyError with the path (a -> b -> c -> a)",
+        "An unknown dependency names both the package and the missing dependency"
+      ],
       "tests": 36,
       "doctests": 3,
       "solution_lines": 241,
@@ -166,6 +201,13 @@
         "dataclasses",
         "streaming aggregation",
         "percentiles"
+      ],
+      "summary": "You are on-call for a service. The only thing you have is access.log in nginx's combined format, with $request_time appended — 40 000 lines of it. Before you can fix anything you need answers: how much traffic, how much…",
+      "criteria": [
+        "Streaming friendly: must work when given a generator, never requires the whole file in memory.",
+        "A bad line must never abort the report — it is counted and skipped.",
+        "Blank / whitespace-only lines are not malformed; they are ignored.",
+        "Deterministic output for identical input (stable tie-breaks, sorted results)."
       ],
       "tests": 21,
       "doctests": 4,
@@ -188,6 +230,13 @@
         "dedupe",
         "data quality"
       ],
+      "summary": "A client sends their sales export every Monday. It comes out of an old POS system and it is *dirty*: the same order appears twice because someone re-ran the export, amounts are typed the way humans type them ($1,250.00…",
+      "criteria": [
+        "Blank cells reject the row instead of raising out of clean_rows.",
+        "DD/MM/YYYY is assumed (the client is not in the US) — documented as an assumption, because 03/11/2026 is genuinely ambiguous.",
+        "Totals are exact: 0.10 + 0.20 must equal Decimal(\"0.30\").",
+        "python -m solution.cli tests/fixtures/sample_sales.csv prints the report, --json emits structured output, --rejects-out out.csv…"
+      ],
       "tests": 23,
       "doctests": 4,
       "solution_lines": 308,
@@ -209,6 +258,13 @@
         "request smuggling",
         "limits"
       ],
+      "summary": "You are writing the HTTP layer of a server (or a load balancer) and reading from a TCP socket. The kernel hands you bytes in whatever sizes it feels like: half a request line, a header split mid-value, half a body. You…",
+      "criteria": [
+        "Any chunking of the same bytes yields the same Request",
+        "Never blocks on incomplete input: feed returns None, buffer stays intact",
+        "Content-Length bodies read exactly that many bytes, no more",
+        "Transfer-Encoding: chunked decoded, including chunk extensions and trailers"
+      ],
       "tests": 37,
       "doctests": 6,
       "solution_lines": 354,
@@ -228,6 +284,13 @@
         "subnets",
         "overlap detection",
         "address aggregation"
+      ],
+      "summary": "You have a /16 for a VPC and a spreadsheet of \"who needs what\": a /24 for the public subnets, a /24 for the app tier, a /28 for the database, a /28 for the VPN. Someone will inevitably paste 10.0.1.0/24 next to…",
+      "criteria": [
+        "Parse/format a.b.c.d/prefix, validating every octet and the prefix",
+        "Reject host bits set (10.0.0.5/24) unless strict=False",
+        "usable_hosts: /24 → 254, /31 → 2, /32 → 1",
+        "contains / overlaps by prefix arithmetic, not string comparison"
       ],
       "tests": 38,
       "doctests": 5,
