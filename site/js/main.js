@@ -420,40 +420,66 @@ async function bootScene(name, factory) {
   }
 }
 
-async function startScenes(data) {
-  await Promise.all([
-    bootScene('hero', async () => {
-      const { createHeroScene } = await sceneModules.hero();
-      return createHeroScene(document.getElementById('hero-canvas'), state.problems);
-    }),
+/**
+ * Boot a scene the first time its canvas comes close to the viewport.
+ *
+ * Four live WebGL contexts on first paint is the difference between a page that
+ * settles instantly and one that stutters on a mid-range phone, and three of these
+ * scenes are nowhere near the fold. The observer fires a little early (400px) so
+ * the module is already downloaded by the time the canvas is actually visible.
+ */
+function bootWhenVisible(name, canvas, start) {
+  if (!canvas) return;
 
-    bootScene('galaxy', async () => {
-      const { createGalaxyScene } = await sceneModules.galaxy();
-      state.galaxy = createGalaxyScene(document.getElementById('galaxy-canvas'), state.problems, {
-        ...tooltipHandlers(),
-        onSelect: selectProblem,
-        // Cards can be filtered before the scene finishes loading.
-        initialFilter: state.category,
-      });
-      return state.galaxy;
-    }),
+  if (!('IntersectionObserver' in window)) {
+    void bootScene(name, start);
+    return;
+  }
 
-    bootScene('bars', async () => {
-      const { createBarsScene } = await sceneModules.bars();
-      return createBarsScene(
-        document.getElementById('bars-canvas'),
-        state.problems,
-        tooltipHandlers(),
-      );
-    }),
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      observer.disconnect();
+      void bootScene(name, start);
+    },
+    { rootMargin: '400px 0px' },
+  );
+  observer.observe(canvas);
+}
 
-    bootScene('structure', async () => {
-      const { createStructureScene } = await sceneModules.structure();
-      return createStructureScene(document.getElementById('structure-canvas'), {
-        labels: ['problem.md', 'solution/', 'tests/'],
-      });
-    }),
-  ]);
+function startScenes() {
+  bootWhenVisible('hero', document.getElementById('hero-canvas'), async () => {
+    const { createHeroScene } = await sceneModules.hero();
+    return createHeroScene(document.getElementById('hero-canvas'), state.problems);
+  });
+
+  bootWhenVisible('galaxy', document.getElementById('galaxy-canvas'), async () => {
+    const { createGalaxyScene } = await sceneModules.galaxy();
+    state.galaxy = createGalaxyScene(document.getElementById('galaxy-canvas'), state.problems, {
+      ...tooltipHandlers(),
+      onSelect: selectProblem,
+      // A filter or a selection may already exist by the time this loads.
+      initialFilter: state.category,
+    });
+    if (state.selected !== null) state.galaxy.focus(state.selected);
+    return state.galaxy;
+  });
+
+  bootWhenVisible('bars', document.getElementById('bars-canvas'), async () => {
+    const { createBarsScene } = await sceneModules.bars();
+    return createBarsScene(
+      document.getElementById('bars-canvas'),
+      state.problems,
+      tooltipHandlers(),
+    );
+  });
+
+  bootWhenVisible('structure', document.getElementById('structure-canvas'), async () => {
+    const { createStructureScene } = await sceneModules.structure();
+    return createStructureScene(document.getElementById('structure-canvas'), {
+      labels: ['problem.md', 'solution/', 'tests/'],
+    });
+  });
 }
 
 function clearFilters() {
@@ -514,8 +540,8 @@ async function bootstrap() {
       else if (event.target.closest('[data-clear]')) clearFilters();
     });
 
-    // Deliberately not awaited: content is on screen before Three.js is downloaded.
-    startScenes(data);
+    // Not awaited: each canvas boots itself once it approaches the viewport.
+    startScenes();
 
     // Keyboard users walk the visible cards without touching the mouse.
     window.addEventListener('keydown', (event) => {

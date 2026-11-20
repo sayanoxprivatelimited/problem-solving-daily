@@ -7,16 +7,16 @@ export default {
     "branch": "main"
   },
   "stats": {
-    "problems": 9,
-    "solved": 9,
+    "problems": 12,
+    "solved": 12,
     "categories": 6,
-    "tests": 253,
-    "doctests": 40,
-    "solution_lines": 2682,
+    "tests": 334,
+    "doctests": 80,
+    "solution_lines": 3820,
     "levels": {
       "easy": 0,
       "medium": 6,
-      "hard": 3
+      "hard": 6
     }
   },
   "categories": [
@@ -27,8 +27,8 @@ export default {
     },
     {
       "name": "backend",
-      "problems": 1,
-      "solved": 1
+      "problems": 2,
+      "solved": 2
     },
     {
       "name": "cli",
@@ -42,13 +42,13 @@ export default {
     },
     {
       "name": "data",
-      "problems": 2,
-      "solved": 2
+      "problems": 3,
+      "solved": 3
     },
     {
       "name": "network",
-      "problems": 2,
-      "solved": 2
+      "problems": 3,
+      "solved": 3
     }
   ],
   "problems": [
@@ -138,6 +138,33 @@ export default {
     },
     {
       "index": 4,
+      "slug": "02-lease-based-lock-with-fencing-tokens",
+      "category": "backend",
+      "title": "Lease-based lock with fencing tokens",
+      "level": "hard",
+      "status": "solved",
+      "concepts": [
+        "leases",
+        "fencing tokens",
+        "clock injection",
+        "thread safety"
+      ],
+      "summary": "Two workers must not write the same invoice file at the same time. The obvious fix is a lock, but a lock held with a *timeout* (a lease) has a hole that shows up in production, not in tests: worker A grabs the lease…",
+      "criteria": [
+        "A lease is live while clock.now() < expires_at; at or past it, the lock is free again",
+        "Every grant increments a fencing counter that never decreases, even across releases",
+        "acquire raises LockHeld when a live lease belongs to somebody else",
+        "renew and release only succeed for the current token, and only while it is live"
+      ],
+      "tests": 28,
+      "doctests": 12,
+      "solution_lines": 362,
+      "path": "problems/backend/02-lease-based-lock-with-fencing-tokens",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/backend/02-lease-based-lock-with-fencing-tokens/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/backend/02-lease-based-lock-with-fencing-tokens/solution/main.py"
+    },
+    {
+      "index": 5,
       "slug": "01-file-organizer",
       "category": "cli",
       "title": "File organizer with undo",
@@ -165,7 +192,7 @@ export default {
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/cli/01-file-organizer/solution/main.py"
     },
     {
-      "index": 5,
+      "index": 6,
       "slug": "01-build-order",
       "category": "coding",
       "title": "Build order from package manifests",
@@ -192,7 +219,7 @@ export default {
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/coding/01-build-order/solution/main.py"
     },
     {
-      "index": 6,
+      "index": 7,
       "slug": "01-nginx-log-report",
       "category": "data",
       "title": "Nginx access log report",
@@ -219,7 +246,7 @@ export default {
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/01-nginx-log-report/solution/main.py"
     },
     {
-      "index": 7,
+      "index": 8,
       "slug": "02-messy-csv-sales-report",
       "category": "data",
       "title": "Clean a messy sales export",
@@ -247,7 +274,34 @@ export default {
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/02-messy-csv-sales-report/solution/main.py"
     },
     {
-      "index": 8,
+      "index": 9,
+      "slug": "03-sessionize-an-out-of-order-event-stream",
+      "category": "data",
+      "title": "Sessionize an out-of-order event stream",
+      "level": "hard",
+      "status": "solved",
+      "concepts": [
+        "event time",
+        "watermarks",
+        "session windows",
+        "late data"
+      ],
+      "summary": "Product wants \"sessions\": a user's activity grouped so that two events belong together while they are at most gap apart, and a new session starts after a longer silence. The events arrive from mobile clients, which…",
+      "criteria": [
+        "Two events of the same key join a session while next.ts - last.ts <= gap",
+        "An event that arrives late and bridges two open sessions merges them into one",
+        "A session closes once end + gap <= watermark, where watermark = max_ts_seen - allowed_lateness",
+        "An event with ts < watermark is dropped and counted, never merged"
+      ],
+      "tests": 25,
+      "doctests": 11,
+      "solution_lines": 340,
+      "path": "problems/data/03-sessionize-an-out-of-order-event-stream",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/03-sessionize-an-out-of-order-event-stream/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/03-sessionize-an-out-of-order-event-stream/solution/main.py"
+    },
+    {
+      "index": 10,
       "slug": "01-incremental-http-parser",
       "category": "network",
       "title": "Incremental HTTP/1.1 request parser",
@@ -275,7 +329,7 @@ export default {
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/01-incremental-http-parser/solution/main.py"
     },
     {
-      "index": 9,
+      "index": 11,
       "slug": "02-cidr-planner",
       "category": "network",
       "title": "CIDR planner for a VPC",
@@ -300,6 +354,33 @@ export default {
       "path": "problems/network/02-cidr-planner",
       "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/02-cidr-planner/problem.md",
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/02-cidr-planner/solution/main.py"
+    },
+    {
+      "index": 12,
+      "slug": "03-retrying-client-with-a-circuit-breaker",
+      "category": "network",
+      "title": "Retrying client with a circuit breaker",
+      "level": "hard",
+      "status": "solved",
+      "concepts": [
+        "retries",
+        "jitter",
+        "circuit breaker",
+        "idempotency"
+      ],
+      "summary": "Your service calls a partner API. It is down for four minutes every other Tuesday, and every one of your 200 workers retries the failing call three times — so the partner sees 600 requests per second of pure noise while…",
+      "criteria": [
+        "Delay before retry *n* is base * multiplier ** (n-1), capped at max_delay, multiplied by jitter",
+        "A non-idempotent call is only retried when the request never reached the server",
+        "The breaker opens after failure_threshold consecutive failures and then rejects calls without touching the network",
+        "Once reset_timeout has elapsed, exactly one trial call is allowed; its outcome closes or re-opens the breaker"
+      ],
+      "tests": 28,
+      "doctests": 17,
+      "solution_lines": 436,
+      "path": "problems/network/03-retrying-client-with-a-circuit-breaker",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/03-retrying-client-with-a-circuit-breaker/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/03-retrying-client-with-a-circuit-breaker/solution/main.py"
     }
   ]
 };

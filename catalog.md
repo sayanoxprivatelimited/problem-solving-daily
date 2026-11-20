@@ -2,35 +2,38 @@
 
 # 📚 Problem catalog
 
-**9** problems · **9** solved and tested · **6** categories · every solved problem has a runnable CLI and a test suite.
+**12** problems · **12** solved and tested · **6** categories · every solved problem has a runnable CLI and a test suite.
 
 | # | Problem | Category | Level | Concepts | Solution | Status |
 |---|---------|----------|-------|----------|----------|--------|
 | 1 | [Byte-pair encoding tokenizer from scratch](problems/ai/01-bpe-tokenizer/problem.md) | `ai` | 🔴 hard | tokenization, BPE, vocabularies, tie-breaking, lossless round-trip | [code](problems/ai/01-bpe-tokenizer/solution/main.py) | ✅ solved |
 | 2 | [Retrieval step for a docs assistant](problems/ai/02-retrieval-with-citations/problem.md) | `ai` | 🟡 medium | chunking, TF-IDF, cosine similarity, citations, determinism | [code](problems/ai/02-retrieval-with-citations/solution/main.py) | ✅ solved |
 | 3 | [Per-key token bucket rate limiter](problems/backend/01-token-bucket-rate-limiter/problem.md) | `backend` | 🔴 hard | concurrency, locks, monotonic clocks, LRU eviction, testable time | [code](problems/backend/01-token-bucket-rate-limiter/solution/main.py) | ✅ solved |
-| 4 | [File organizer with undo](problems/cli/01-file-organizer/problem.md) | `cli` | 🟡 medium | filesystem safety, dry-run, collision handling, manifests, path traversal | [code](problems/cli/01-file-organizer/solution/main.py) | ✅ solved |
-| 5 | [Build order from package manifests](problems/coding/01-build-order/problem.md) | `coding` | 🟡 medium | dependency graphs, topological sort, cycle reporting, incremental builds | [code](problems/coding/01-build-order/solution/main.py) | ✅ solved |
-| 6 | [Nginx access log report](problems/data/01-nginx-log-report/problem.md) | `data` | 🟡 medium | regex parsing, dataclasses, streaming aggregation, percentiles | [code](problems/data/01-nginx-log-report/solution/main.py) | ✅ solved |
-| 7 | [Clean a messy sales export](problems/data/02-messy-csv-sales-report/problem.md) | `data` | 🟡 medium | CSV parsing, Decimal money math, multi-format dates, dedupe, data quality | [code](problems/data/02-messy-csv-sales-report/solution/main.py) | ✅ solved |
-| 8 | [Incremental HTTP/1.1 request parser](problems/network/01-incremental-http-parser/problem.md) | `network` | 🔴 hard | byte-stream parsing, state machines, chunked encoding, request smuggling, limits | [code](problems/network/01-incremental-http-parser/solution/main.py) | ✅ solved |
-| 9 | [CIDR planner for a VPC](problems/network/02-cidr-planner/problem.md) | `network` | 🟡 medium | IPv4 math, subnets, overlap detection, address aggregation | [code](problems/network/02-cidr-planner/solution/main.py) | ✅ solved |
+| 4 | [Lease-based lock with fencing tokens](problems/backend/02-lease-based-lock-with-fencing-tokens/problem.md) | `backend` | 🔴 hard | leases, fencing tokens, clock injection, thread safety | [code](problems/backend/02-lease-based-lock-with-fencing-tokens/solution/main.py) | ✅ solved |
+| 5 | [File organizer with undo](problems/cli/01-file-organizer/problem.md) | `cli` | 🟡 medium | filesystem safety, dry-run, collision handling, manifests, path traversal | [code](problems/cli/01-file-organizer/solution/main.py) | ✅ solved |
+| 6 | [Build order from package manifests](problems/coding/01-build-order/problem.md) | `coding` | 🟡 medium | dependency graphs, topological sort, cycle reporting, incremental builds | [code](problems/coding/01-build-order/solution/main.py) | ✅ solved |
+| 7 | [Nginx access log report](problems/data/01-nginx-log-report/problem.md) | `data` | 🟡 medium | regex parsing, dataclasses, streaming aggregation, percentiles | [code](problems/data/01-nginx-log-report/solution/main.py) | ✅ solved |
+| 8 | [Clean a messy sales export](problems/data/02-messy-csv-sales-report/problem.md) | `data` | 🟡 medium | CSV parsing, Decimal money math, multi-format dates, dedupe, data quality | [code](problems/data/02-messy-csv-sales-report/solution/main.py) | ✅ solved |
+| 9 | [Sessionize an out-of-order event stream](problems/data/03-sessionize-an-out-of-order-event-stream/problem.md) | `data` | 🔴 hard | event time, watermarks, session windows, late data | [code](problems/data/03-sessionize-an-out-of-order-event-stream/solution/main.py) | ✅ solved |
+| 10 | [Incremental HTTP/1.1 request parser](problems/network/01-incremental-http-parser/problem.md) | `network` | 🔴 hard | byte-stream parsing, state machines, chunked encoding, request smuggling, limits | [code](problems/network/01-incremental-http-parser/solution/main.py) | ✅ solved |
+| 11 | [CIDR planner for a VPC](problems/network/02-cidr-planner/problem.md) | `network` | 🟡 medium | IPv4 math, subnets, overlap detection, address aggregation | [code](problems/network/02-cidr-planner/solution/main.py) | ✅ solved |
+| 12 | [Retrying client with a circuit breaker](problems/network/03-retrying-client-with-a-circuit-breaker/problem.md) | `network` | 🔴 hard | retries, jitter, circuit breaker, idempotency | [code](problems/network/03-retrying-client-with-a-circuit-breaker/solution/main.py) | ✅ solved |
 
 ## Breakdown
 
 | Category | Problems | Solved |
 |----------|----------|--------|
 | `ai` | 2 | 2 |
-| `backend` | 1 | 1 |
+| `backend` | 2 | 2 |
 | `cli` | 1 | 1 |
 | `coding` | 1 | 1 |
-| `data` | 2 | 2 |
-| `network` | 2 | 2 |
+| `data` | 3 | 3 |
+| `network` | 3 | 3 |
 
 | Level | Problems |
 |-------|----------|
 | 🟡 medium | 6 |
-| 🔴 hard | 3 |
+| 🔴 hard | 6 |
 
 ## Repository checks
 
