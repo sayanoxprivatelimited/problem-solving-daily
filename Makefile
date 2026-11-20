@@ -1,4 +1,4 @@
-.PHONY: help test catalog site site-test site-bundle serve new clean
+.PHONY: help test catalog site site-test site-bundle site-shell serve new clean
 
 help:
 	@echo "make test      - run every problem's tests + doctests, then the site tests"
@@ -6,6 +6,7 @@ help:
 	@echo "make site-test - run the site's Node tests (layout, wiring)"
 	@echo "make serve     - serve the 3D site on http://localhost:8000"
 	@echo "make site-bundle - build .site-dist/, the upload-ready static bundle"
+	@echo "make site-shell  - build .site-dist-remote/, the one-file CDN shell"
 	@echo "make new       - scaffold: make new CATEGORY=data TITLE='Retry with backoff'"
 	@echo "make clean     - remove __pycache__ folders"
 
@@ -26,6 +27,10 @@ site-test:
 
 site-bundle:
 	python3 scripts/build_site_deploy.py --print
+
+site-shell:
+	@test -n "$(REF)" || (echo "usage: make site-shell REF=<commit-sha>" && exit 2)
+	python3 scripts/build_site_deploy.py --remote-ref $(REF)
 
 serve:
 	@echo "serving site/ on http://localhost:8000 (ctrl-c to stop)"

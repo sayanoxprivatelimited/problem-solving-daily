@@ -13,6 +13,12 @@ markup, styles, scenes, the generated catalogue data — ships byte for byte.
 
     python3 scripts/build_site_deploy.py            # build .site-dist/
     python3 scripts/build_site_deploy.py --print    # build and list the payload
+    python3 scripts/build_site_deploy.py --remote-ref <sha>   # single-file shell
+
+`--remote-ref` exists for upload channels that only accept small inline payloads:
+it writes `.site-dist-remote/index.html`, a shell whose stylesheet and module entry
+point load from jsDelivr's GitHub mirror at that commit. Pin a commit SHA, never a
+branch, so the deployed page cannot change under you.
 
 The bundle is an artifact, not source: ``.site-dist/`` is git-ignored, and the
 committed ``site/`` folder remains the single source of truth.
@@ -28,6 +34,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
 DIST = ROOT / ".site-dist"
+REMOTE_DIST = ROOT / ".site-dist-remote"
+
+REPOSITORY = "sayanoxprivatelimited/problem-solving-daily"
 
 #: Files that belong in the browser-facing bundle, relative to ``site/``.
 PAYLOAD = (
@@ -40,7 +49,7 @@ PAYLOAD = (
     "js/scenes/galaxy.js",
     "js/scenes/bars.js",
     "js/scenes/structure.js",
-    "data/problems.json",
+    "data/catalog.js",
 )
 
 #: Same version as the vendored build, so local and deployed behaviour match.
@@ -92,6 +101,31 @@ def build() -> list[Path]:
     return written
 
 
+def build_remote(ref: str) -> Path:
+    """Write a one-file shell that loads the site from the repository's CDN mirror."""
+    if not ref or "/" in ref or ref.startswith("-"):
+        raise SystemExit(f"not a commit SHA or branch: {ref!r}")
+
+    base = f"https://cdn.jsdelivr.net/gh/{REPOSITORY}@{ref}/site"
+    html = (SITE / "index.html").read_text(encoding="utf-8")
+
+    for local, remote in (
+        ('href="css/style.css"', f'href="{base}/css/style.css"'),
+        ('src="js/main.js"', f'src="{base}/js/main.js"'),
+    ):
+        if local not in html:
+            raise SystemExit(f"index.html no longer contains: {local}")
+        html = html.replace(local, remote)
+
+    html = html.replace(LOCAL_MAP, REMOTE_MAP)
+
+    REMOTE_DIST.mkdir(parents=True, exist_ok=True)
+    index = REMOTE_DIST / "index.html"
+    index.write_text(html, encoding="utf-8")
+    print(f"built .site-dist-remote/index.html — {index.stat().st_size} B, assets at {base}")
+    return index
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument(
@@ -100,7 +134,17 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="list the bundle files (path and size) after building",
     )
+    parser.add_argument(
+        "--remote-ref",
+        metavar="REF",
+        help="only build the single-file shell that loads assets from jsDelivr at REF",
+    )
     args = parser.parse_args(argv)
+
+    if args.remote_ref:
+        vendored_version()
+        build_remote(args.remote_ref)
+        return 0
 
     revision = vendored_version()
     if f"three@{THREE_VERSION}" not in CDN_URL or revision != "169":

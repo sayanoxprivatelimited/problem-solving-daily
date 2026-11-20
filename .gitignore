@@ -16,3 +16,4 @@ env/
 
 # Build artifacts
 .site-dist/
+.site-dist-remote/

@@ -23,7 +23,7 @@ The page needs to be served over HTTP (ES modules and `fetch` do not work from
 
 ## Data comes from the repository, not from the page
 
-`site/data/problems.json` is **generated** by `scripts/build_catalog.py`, which reads
+`site/data/catalog.js` is **generated** by `scripts/build_catalog.py`, which reads
 the front matter of every `problems/**/problem.md` and counts tests, doctests and
 solution lines. So the site can never advertise a problem that does not exist, or a
 test count that is wrong:
@@ -33,7 +33,9 @@ python scripts/build_catalog.py            # refresh catalog.md + site data
 python scripts/build_catalog.py --check    # CI: fail if either is stale
 ```
 
-`site/tests/wiring.test.mjs` also compares the JSON against the folders on disk.
+The page imports the module — no `fetch`, no loading state, and the site also works
+opened straight from disk. `site/tests/wiring.test.mjs` checks that the module mirrors
+`problems.json` and that both match the folders on disk.
 
 ## Layout
 
@@ -50,7 +52,8 @@ site/
 │       ├── galaxy.js      # catalogue nodes + raycasting + drag orbit
 │       ├── bars.js        # 3D bar chart
 │       └── structure.js   # wireframe divider
-├── data/problems.json     # generated
+├── data/catalog.js        # generated ES module the page imports
+├── data/problems.json     # the same payload, for tooling
 ├── assets/three.module.js # vendored Three.js r169 (MIT)
 └── tests/                 # node --test
 ```
