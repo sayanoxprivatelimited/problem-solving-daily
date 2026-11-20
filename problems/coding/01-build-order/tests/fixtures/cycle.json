@@ -1,0 +1,5 @@
+{
+  "api": {"version": "1.0.0", "depends": ["db"]},
+  "db": {"version": "1.0.0", "depends": ["common"]},
+  "common": {"version": "1.0.0", "depends": ["api"]}
+}

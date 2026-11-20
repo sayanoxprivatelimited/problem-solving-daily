@@ -4,12 +4,12 @@ Real-world engineering problems, solved **end to end**: a written brief, runnabl
 code, a test suite, and a CLI you can actually run.
 
 Most practice repositories are algorithm puzzles. This one is the messy stuff you
-get paid for: a client's dirty CSV export, a rate limiter that must survive eight
-threads, a folder of 900 files that has to be reorganised without losing one of
-them. Every problem states its constraints and its assumptions — because that is
-the part that is hard in real work.
+get paid for: a client's dirty CSV export, a tokenizer that must not lose a
+whitespace, an HTTP parser that must survive hostile chunking, a rate limiter that
+must hold under eight threads. Every problem states its constraints and its
+assumptions — because that is the part that is hard in real work.
 
-**4 problems · 91 tests · 17 doctests · 3 categories · zero dependencies** (Python 3.10+)
+**9 problems · 253 tests · 40 doctests · 6 categories · zero dependencies** (Python 3.10+)
 
 ---
 
@@ -17,27 +17,33 @@ the part that is hard in real work.
 
 | # | Problem | Category | Level | The real part |
 |---|---------|----------|-------|---------------|
-| 1 | [Nginx access log report](problems/data/01-nginx-log-report/problem.md) | `data` | 🟡 medium | truncated lines and probe spam must not break the report |
-| 2 | [Clean a messy sales export](problems/data/02-messy-csv-sales-report/problem.md) | `data` | 🟡 medium | duplicates, 3 date formats, `(120.00)` refunds, exact money |
+| 1 | [Byte-pair encoding tokenizer](problems/ai/01-bpe-tokenizer/problem.md) | `ai` | 🔴 hard | lossless round-trip, merge ranks, deterministic training, save/load |
+| 2 | [Retrieval step for a docs assistant](problems/ai/02-retrieval-with-citations/problem.md) | `ai` | 🟡 medium | sentence-aware chunking, TF-IDF ranking, citations that slice the source |
 | 3 | [Per-key token bucket rate limiter](problems/backend/01-token-bucket-rate-limiter/problem.md) | `backend` | 🔴 hard | threads, injectable clock, LRU memory bound, `Retry-After` |
-| 4 | [File organizer with undo](problems/cli/01-file-organizer/problem.md) | `cli` | 🟡 medium | dry-run, collision-safe renames, manifest-driven rollback |
+| 4 | [File organizer with undo](problems/cli/01-file-organizer/problem.md) | `cli` | 🟡 medium | dry-run, collision-safe renames, manifest rollback, path-traversal guard |
+| 5 | [Build order from package manifests](problems/coding/01-build-order/problem.md) | `coding` | 🟡 medium | cycle reported as a path, alphabetical determinism, rebuild closure |
+| 6 | [Nginx access log report](problems/data/01-nginx-log-report/problem.md) | `data` | 🟡 medium | truncated lines must not break the report, nearest-rank p95 |
+| 7 | [Clean a messy sales export](problems/data/02-messy-csv-sales-report/problem.md) | `data` | 🟡 medium | duplicates, 3 date formats, `(120.00)` refunds, exact money |
+| 8 | [Incremental HTTP/1.1 parser](problems/network/01-incremental-http-parser/problem.md) | `network` | 🔴 hard | arbitrary TCP chunking, chunked encoding, smuggling defenses |
+| 9 | [CIDR planner for a VPC](problems/network/02-cidr-planner/problem.md) | `network` | 🟡 medium | subnet maths, overlap detection, prefix aggregation, stdlib parity |
 
-Generated table with links, concepts and complexity of each: **[catalog.md](catalog.md)**
+Generated table with links, concepts and per-category stats: **[catalog.md](catalog.md)**
 (regenerate with `python scripts/build_catalog.py`).
 
 ## Quick start
 
 ```bash
 python scripts/run_tests.py             # every problem: tests + doctests
-python scripts/run_tests.py --only data # just the data problems
+python scripts/run_tests.py --only ai   # just the ai problems
 python scripts/run_tests.py -v          # one line per test
 ```
 
 Run one problem on its own:
 
 ```bash
-cd problems/data/02-messy-csv-sales-report
-python -m solution.cli tests/fixtures/sample_sales.csv
+cd problems/ai/01-bpe-tokenizer
+python -m solution.cli --corpus tests/fixtures/corpus.txt --vocab-size 400 \
+    --text "the tokenizer must round trip the same text"
 python -m unittest discover -s tests -t .
 ```
 
@@ -48,34 +54,43 @@ No `pip install` anywhere — standard library only, so a fresh clone works offl
 ```
 .
 ├── problems/
-│   ├── data/
-│   │   ├── 01-nginx-log-report/
-│   │   │   ├── problem.md              # brief: context, requirements, assumptions
-│   │   │   ├── solution/
-│   │   │   │   ├── main.py             # the logic (+ runnable >>> examples)
-│   │   │   │   └── cli.py              # thin argparse wrapper
-│   │   │   └── tests/
-│   │   │       ├── test_main.py
-│   │   │       └── fixtures/sample.log
-│   │   └── 02-messy-csv-sales-report/…
-│   ├── backend/01-token-bucket-rate-limiter/…
-│   └── cli/01-file-organizer/…
+│   ├── ai/
+│   │   ├── 01-bpe-tokenizer/{problem.md, solution/, tests/}
+│   │   └── 02-retrieval-with-citations/
+│   ├── backend/01-token-bucket-rate-limiter/
+│   ├── cli/01-file-organizer/
+│   ├── coding/01-build-order/
+│   ├── data/{01-nginx-log-report, 02-messy-csv-sales-report}/
+│   └── network/{01-incremental-http-parser, 02-cidr-planner}/
 ├── scripts/
-│   ├── run_tests.py                    # per-problem import isolation + doctests
-│   ├── build_catalog.py                # problem.md front matter → catalog.md
-│   └── new_problem.py                  # scaffold a new problem (red-first)
-├── templates/                          # problem.md / module / test skeletons
-├── catalog.md                          # generated
-└── Makefile                            # make test | catalog | new | clean
+│   ├── run_tests.py         # per-problem import isolation + doctests
+│   ├── build_catalog.py     # problem.md front matter → catalog.md
+│   └── new_problem.py       # scaffold a new problem (red-first)
+├── templates/               # problem.md / module / test skeletons
+├── catalog.md               # generated
+└── Makefile                 # make test | catalog | new | clean
+```
+
+Each problem folder is the same shape:
+
+```
+<NN-slug>/
+├── problem.md      # brief: context, requirements (+ why), assumptions, limits
+├── solution/
+│   ├── main.py     # the logic, with runnable >>> examples in the docstring
+│   └── cli.py      # thin argparse wrapper
+└── tests/
+    ├── test_main.py
+    └── fixtures/
 ```
 
 ## Add a problem
 
 ```bash
-python scripts/new_problem.py data "Retry with exponential backoff" \
-    --level medium --concepts "retries, backoff, jitter"
+python scripts/new_problem.py network "WebSocket frame decoder" \
+    --level hard --concepts "framing, masking, fragmentation"
 
-# or: make new CATEGORY=data TITLE='Retry with exponential backoff'
+# or: make new CATEGORY=network TITLE='WebSocket frame decoder'
 ```
 
 This creates `problem.md`, `solution/{__init__,main}.py`, `tests/{__init__,test_main}.py`
@@ -85,15 +100,17 @@ purpose**: you start from red, describe the behaviour, then make it green.
 ## Definition of done
 
 1. **A brief somebody else could implement.** `problem.md` has context, input/output,
-   numbered requirements with a *why*, and an explicit assumptions section.
+   numbered requirements with a *why*, an explicit assumptions section and a
+   documented-limits section.
 2. **Solution code with doctests.** `solution/main.py` carries the reasoning in its
    docstring; runnable `>>>` examples are executed by the test runner.
 3. **Tests that would catch the bug you actually fear.** Not just the happy example:
-   empty input, malformed input, ties, collisions, clock going backwards, threads.
+   empty input, malformed input, ties, collisions, clock going backwards, threads,
+   bytes split at every possible offset.
 4. **A CLI when a human would run it.** `python -m solution.cli --help` must work.
 5. **All green.** `python scripts/run_tests.py` passes, and `catalog.md` is regenerated.
 6. **Trade-offs are written down.** Example: LRU eviction in the limiter weakens
-   fairness; that is stated in the brief instead of hidden in the code.
+   fairness, and evicted keys come back with a full bucket — stated, not hidden.
 
 ## Design notes
 
@@ -104,17 +121,23 @@ purpose**: you start from red, describe the behaviour, then make it green.
   keys is not worth it (see `scripts/build_catalog.py`).
 - **Each problem owns a `solution` package**, which is why the runner builds a clean
   import context per problem instead of one global `unittest discover`.
-- **Time is injected, not slept on.** The limiter takes a `clock` callable, so the
-  concurrency tests are deterministic and finish in milliseconds.
-- **Money is `Decimal`.** `0.1 + 0.2 != 0.3` is a real bug report in finance code.
+- **Time and randomness are injected.** The limiter takes a `clock` callable and the
+  cross-check tests use fixed seeds, so nothing is flaky and nothing sleeps.
+- **Money is `Decimal`, bytes stay bytes.** Two places where "close enough" is a bug
+  report: finance code and network framing.
+- **Determinism is a feature.** Alphabetical tie-breaks in build order, rank-ordered
+  merges in BPE, `(doc_id, start)` ties in retrieval: same input, same output, always.
+- **Parity with the stdlib is tested** where it exists (`ipaddress`), so the exercise
+  cannot quietly disagree with the language.
 
 ## Roadmap (planned problems)
 
-- `data/03` — streaming dedupe of a 10 GB JSONL file with constant memory
+- `data/03` — streaming dedupe of a 10 GB JSONL file in constant memory
 - `backend/02` — idempotency keys with a pluggable store
 - `backend/03` — cursor pagination over a mutable list
-- `cli/02` — safe bulk-rename with a regex preview and `--dry-run`
-- `data/04` — timezone-correct hourly aggregation across DST boundaries
+- `network/03` — WebSocket frame decoder (masking, fragmentation, control frames)
+- `ai/03` — evaluation harness: precision/recall, cost per 1k requests, regressions
+- `coding/02` — unified diff / patch engine
 
 ## License
 

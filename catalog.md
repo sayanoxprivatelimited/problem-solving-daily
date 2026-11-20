@@ -2,27 +2,35 @@
 
 # 📚 Problem catalog
 
-**4** problems · **4** solved and tested · **3** categories · every solved problem has a runnable CLI and a test suite.
+**9** problems · **9** solved and tested · **6** categories · every solved problem has a runnable CLI and a test suite.
 
 | # | Problem | Category | Level | Concepts | Solution | Status |
 |---|---------|----------|-------|----------|----------|--------|
-| 1 | [Per-key token bucket rate limiter](problems/backend/01-token-bucket-rate-limiter/problem.md) | `backend` | 🔴 hard | concurrency, locks, monotonic clocks, LRU eviction, testable time | [code](problems/backend/01-token-bucket-rate-limiter/solution/main.py) | ✅ solved |
-| 2 | [File organizer with undo](problems/cli/01-file-organizer/problem.md) | `cli` | 🟡 medium | filesystem safety, dry-run, collision handling, manifests, path traversal | [code](problems/cli/01-file-organizer/solution/main.py) | ✅ solved |
-| 3 | [Nginx access log report](problems/data/01-nginx-log-report/problem.md) | `data` | 🟡 medium | regex parsing, dataclasses, streaming aggregation, percentiles | [code](problems/data/01-nginx-log-report/solution/main.py) | ✅ solved |
-| 4 | [Clean a messy sales export](problems/data/02-messy-csv-sales-report/problem.md) | `data` | 🟡 medium | CSV parsing, Decimal money math, multi-format dates, dedupe, data quality | [code](problems/data/02-messy-csv-sales-report/solution/main.py) | ✅ solved |
+| 1 | [Byte-pair encoding tokenizer from scratch](problems/ai/01-bpe-tokenizer/problem.md) | `ai` | 🔴 hard | tokenization, BPE, vocabularies, tie-breaking, lossless round-trip | [code](problems/ai/01-bpe-tokenizer/solution/main.py) | ✅ solved |
+| 2 | [Retrieval step for a docs assistant](problems/ai/02-retrieval-with-citations/problem.md) | `ai` | 🟡 medium | chunking, TF-IDF, cosine similarity, citations, determinism | [code](problems/ai/02-retrieval-with-citations/solution/main.py) | ✅ solved |
+| 3 | [Per-key token bucket rate limiter](problems/backend/01-token-bucket-rate-limiter/problem.md) | `backend` | 🔴 hard | concurrency, locks, monotonic clocks, LRU eviction, testable time | [code](problems/backend/01-token-bucket-rate-limiter/solution/main.py) | ✅ solved |
+| 4 | [File organizer with undo](problems/cli/01-file-organizer/problem.md) | `cli` | 🟡 medium | filesystem safety, dry-run, collision handling, manifests, path traversal | [code](problems/cli/01-file-organizer/solution/main.py) | ✅ solved |
+| 5 | [Build order from package manifests](problems/coding/01-build-order/problem.md) | `coding` | 🟡 medium | dependency graphs, topological sort, cycle reporting, incremental builds | [code](problems/coding/01-build-order/solution/main.py) | ✅ solved |
+| 6 | [Nginx access log report](problems/data/01-nginx-log-report/problem.md) | `data` | 🟡 medium | regex parsing, dataclasses, streaming aggregation, percentiles | [code](problems/data/01-nginx-log-report/solution/main.py) | ✅ solved |
+| 7 | [Clean a messy sales export](problems/data/02-messy-csv-sales-report/problem.md) | `data` | 🟡 medium | CSV parsing, Decimal money math, multi-format dates, dedupe, data quality | [code](problems/data/02-messy-csv-sales-report/solution/main.py) | ✅ solved |
+| 8 | [Incremental HTTP/1.1 request parser](problems/network/01-incremental-http-parser/problem.md) | `network` | 🔴 hard | byte-stream parsing, state machines, chunked encoding, request smuggling, limits | [code](problems/network/01-incremental-http-parser/solution/main.py) | ✅ solved |
+| 9 | [CIDR planner for a VPC](problems/network/02-cidr-planner/problem.md) | `network` | 🟡 medium | IPv4 math, subnets, overlap detection, address aggregation | [code](problems/network/02-cidr-planner/solution/main.py) | ✅ solved |
 
 ## Breakdown
 
 | Category | Problems | Solved |
 |----------|----------|--------|
+| `ai` | 2 | 2 |
 | `backend` | 1 | 1 |
 | `cli` | 1 | 1 |
+| `coding` | 1 | 1 |
 | `data` | 2 | 2 |
+| `network` | 2 | 2 |
 
 | Level | Problems |
 |-------|----------|
-| 🟡 medium | 3 |
-| 🔴 hard | 1 |
+| 🟡 medium | 6 |
+| 🔴 hard | 3 |
 
 ## Repository checks
 
