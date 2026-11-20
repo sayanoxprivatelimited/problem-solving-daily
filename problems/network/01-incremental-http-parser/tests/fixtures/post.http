@@ -1,0 +1,6 @@
+POST /v1/items HTTP/1.1
+Host: api.example
+Content-Type: application/json
+Content-Length: 13
+
+{"ok": true}

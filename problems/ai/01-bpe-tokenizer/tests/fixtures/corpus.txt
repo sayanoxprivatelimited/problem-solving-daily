@@ -1,0 +1,13 @@
+A tokenizer is the first component of every language model pipeline.
+Tokenizers turn text into token ids, and every token id costs money to process.
+A good tokenizer learns frequent character pairs so that common words become one token.
+Training is simple: count adjacent symbol pairs, merge the most frequent pair, repeat.
+The tokenizer must be lossless: decoding the token ids has to give back the text.
+Whitespace is information, so the tokenizer keeps spaces inside the tokens themselves.
+Determinism matters as well: the same corpus and the same vocabulary size give the same merges.
+Unknown characters are rare, but a tokenizer must say what it does with them instead of guessing.
+The vocabulary size is a budget, and the merge table is the artefact you ship with the weights.
+Encode the text, decode the token ids, and check that nothing changed along the way.
+Tokenizers are small, testable components, and they deserve tests like any other component.
+The pipeline is only as reproducible as the tokenizer that feeds it, so we version both together.
+A tokenizer that loses a space turns a sentence into a puzzle for the model that reads it.
