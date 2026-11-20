@@ -114,3 +114,24 @@ and `site/` remains the source of truth.
 Because the scenes are imported lazily, a failed `three` request costs the four
 canvases and nothing else: the cards, filters, stats and footer are already in the
 DOM, and the page switches to its `no-webgl` styles.
+
+## Deployment
+
+Live at **https://problem-solving-daily.vercel.app** (Vercel project
+`problem-solving-daily`, hobby plan).
+
+Two artifacts come out of `scripts/build_site_deploy.py`, because upload channels
+differ:
+
+| Target | Command | Contents |
+| --- | --- | --- |
+| Git / CI | `make site-bundle` | `.site-dist/` — 10 files, ~74 KB, import map rewritten to the pinned CDN copy of Three.js |
+| Upload API with a small inline limit | `make site-shell REF=<commit-sha>` | `.site-dist-remote/index.html` — one 7 KB file that loads `css/style.css` and `js/main.js` from jsDelivr's GitHub mirror at that commit |
+
+The deployed shell is pinned to a commit, so the page cannot change under you; to
+publish a new version, commit, push, then rebuild the shell with the new SHA and
+upload it again.
+
+A git-connected project (Vercel's GitHub integration) would remove the shell
+entirely: it would just build `site/` as a static root directory. The current
+project is file-upload based, which is why the shell exists.

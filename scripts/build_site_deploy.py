@@ -119,6 +119,16 @@ def build_remote(ref: str) -> Path:
 
     html = html.replace(LOCAL_MAP, REMOTE_MAP)
 
+    # The same preload swap the local bundle does, plus a guard: nothing may point
+    # at a file this one-file deployment does not contain.
+    html = html.replace(
+        '    <link rel="preload" href="assets/three.module.js" as="script" crossorigin="anonymous" />',
+        '    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin="anonymous" />',
+    )
+    for stale in ('href="css/', 'src="js/', 'href="assets/', 'assets/three.module.js'):
+        if stale in html:
+            raise SystemExit(f"remote shell still references a local file: {stale}")
+
     REMOTE_DIST.mkdir(parents=True, exist_ok=True)
     index = REMOTE_DIST / "index.html"
     index.write_text(html, encoding="utf-8")
