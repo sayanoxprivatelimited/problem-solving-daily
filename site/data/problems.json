@@ -1,0 +1,240 @@
+{
+  "generated_by": "scripts/build_catalog.py — do not edit by hand",
+  "repository": {
+    "url": "https://github.com/sayanoxprivatelimited/problem-solving-daily",
+    "branch": "main"
+  },
+  "stats": {
+    "problems": 9,
+    "solved": 9,
+    "categories": 6,
+    "tests": 253,
+    "doctests": 40,
+    "solution_lines": 2682,
+    "levels": {
+      "easy": 0,
+      "medium": 6,
+      "hard": 3
+    }
+  },
+  "categories": [
+    {
+      "name": "ai",
+      "problems": 2,
+      "solved": 2
+    },
+    {
+      "name": "backend",
+      "problems": 1,
+      "solved": 1
+    },
+    {
+      "name": "cli",
+      "problems": 1,
+      "solved": 1
+    },
+    {
+      "name": "coding",
+      "problems": 1,
+      "solved": 1
+    },
+    {
+      "name": "data",
+      "problems": 2,
+      "solved": 2
+    },
+    {
+      "name": "network",
+      "problems": 2,
+      "solved": 2
+    }
+  ],
+  "problems": [
+    {
+      "index": 1,
+      "slug": "01-bpe-tokenizer",
+      "category": "ai",
+      "title": "Byte-pair encoding tokenizer from scratch",
+      "level": "hard",
+      "status": "solved",
+      "concepts": [
+        "tokenization",
+        "BPE",
+        "vocabularies",
+        "tie-breaking",
+        "lossless round-trip"
+      ],
+      "tests": 21,
+      "doctests": 5,
+      "solution_lines": 369,
+      "path": "problems/ai/01-bpe-tokenizer",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/ai/01-bpe-tokenizer/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/ai/01-bpe-tokenizer/solution/main.py"
+    },
+    {
+      "index": 2,
+      "slug": "02-retrieval-with-citations",
+      "category": "ai",
+      "title": "Retrieval step for a docs assistant",
+      "level": "medium",
+      "status": "solved",
+      "concepts": [
+        "chunking",
+        "TF-IDF",
+        "cosine similarity",
+        "citations",
+        "determinism"
+      ],
+      "tests": 30,
+      "doctests": 4,
+      "solution_lines": 305,
+      "path": "problems/ai/02-retrieval-with-citations",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/ai/02-retrieval-with-citations/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/ai/02-retrieval-with-citations/solution/main.py"
+    },
+    {
+      "index": 3,
+      "slug": "01-token-bucket-rate-limiter",
+      "category": "backend",
+      "title": "Per-key token bucket rate limiter",
+      "level": "hard",
+      "status": "solved",
+      "concepts": [
+        "concurrency",
+        "locks",
+        "monotonic clocks",
+        "LRU eviction",
+        "testable time"
+      ],
+      "tests": 18,
+      "doctests": 5,
+      "solution_lines": 227,
+      "path": "problems/backend/01-token-bucket-rate-limiter",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/backend/01-token-bucket-rate-limiter/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/backend/01-token-bucket-rate-limiter/solution/main.py"
+    },
+    {
+      "index": 4,
+      "slug": "01-file-organizer",
+      "category": "cli",
+      "title": "File organizer with undo",
+      "level": "medium",
+      "status": "solved",
+      "concepts": [
+        "filesystem safety",
+        "dry-run",
+        "collision handling",
+        "manifests",
+        "path traversal"
+      ],
+      "tests": 29,
+      "doctests": 4,
+      "solution_lines": 271,
+      "path": "problems/cli/01-file-organizer",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/cli/01-file-organizer/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/cli/01-file-organizer/solution/main.py"
+    },
+    {
+      "index": 5,
+      "slug": "01-build-order",
+      "category": "coding",
+      "title": "Build order from package manifests",
+      "level": "medium",
+      "status": "solved",
+      "concepts": [
+        "dependency graphs",
+        "topological sort",
+        "cycle reporting",
+        "incremental builds"
+      ],
+      "tests": 36,
+      "doctests": 3,
+      "solution_lines": 241,
+      "path": "problems/coding/01-build-order",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/coding/01-build-order/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/coding/01-build-order/solution/main.py"
+    },
+    {
+      "index": 6,
+      "slug": "01-nginx-log-report",
+      "category": "data",
+      "title": "Nginx access log report",
+      "level": "medium",
+      "status": "solved",
+      "concepts": [
+        "regex parsing",
+        "dataclasses",
+        "streaming aggregation",
+        "percentiles"
+      ],
+      "tests": 21,
+      "doctests": 4,
+      "solution_lines": 229,
+      "path": "problems/data/01-nginx-log-report",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/01-nginx-log-report/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/01-nginx-log-report/solution/main.py"
+    },
+    {
+      "index": 7,
+      "slug": "02-messy-csv-sales-report",
+      "category": "data",
+      "title": "Clean a messy sales export",
+      "level": "medium",
+      "status": "solved",
+      "concepts": [
+        "CSV parsing",
+        "Decimal money math",
+        "multi-format dates",
+        "dedupe",
+        "data quality"
+      ],
+      "tests": 23,
+      "doctests": 4,
+      "solution_lines": 308,
+      "path": "problems/data/02-messy-csv-sales-report",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/02-messy-csv-sales-report/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/02-messy-csv-sales-report/solution/main.py"
+    },
+    {
+      "index": 8,
+      "slug": "01-incremental-http-parser",
+      "category": "network",
+      "title": "Incremental HTTP/1.1 request parser",
+      "level": "hard",
+      "status": "solved",
+      "concepts": [
+        "byte-stream parsing",
+        "state machines",
+        "chunked encoding",
+        "request smuggling",
+        "limits"
+      ],
+      "tests": 37,
+      "doctests": 6,
+      "solution_lines": 354,
+      "path": "problems/network/01-incremental-http-parser",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/01-incremental-http-parser/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/01-incremental-http-parser/solution/main.py"
+    },
+    {
+      "index": 9,
+      "slug": "02-cidr-planner",
+      "category": "network",
+      "title": "CIDR planner for a VPC",
+      "level": "medium",
+      "status": "solved",
+      "concepts": [
+        "IPv4 math",
+        "subnets",
+        "overlap detection",
+        "address aggregation"
+      ],
+      "tests": 38,
+      "doctests": 5,
+      "solution_lines": 378,
+      "path": "problems/network/02-cidr-planner",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/02-cidr-planner/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/02-cidr-planner/solution/main.py"
+    }
+  ]
+}
