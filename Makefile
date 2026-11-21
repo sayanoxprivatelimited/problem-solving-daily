@@ -1,9 +1,10 @@
-.PHONY: help test catalog site site-test site-bundle site-shell serve new clean
+.PHONY: help test catalog seo site site-test site-bundle site-shell serve new clean
 
 help:
 	@echo "make test      - run every problem's tests + doctests, then the site tests"
 	@echo "make catalog   - regenerate catalog.md and site/data/problems.json"
-	@echo "make site-test - run the site's Node tests (layout, wiring)"
+	@echo "make seo       - regenerate robots.txt, sitemap.xml and the JSON-LD block"
+	@echo "make site-test - run the site's Node tests (layout, wiring, seo)"
 	@echo "make serve     - serve the 3D site on http://localhost:8000"
 	@echo "make site-bundle - build .site-dist/, the upload-ready static bundle"
 	@echo "make site-shell  - build .site-dist-remote/, the one-file CDN shell"
@@ -19,7 +20,10 @@ test:
 catalog:
 	python3 scripts/build_catalog.py
 
-site: catalog
+seo:
+	python3 scripts/build_seo.py
+
+site: catalog seo
 	@echo "data ready - now run: make serve"
 
 site-test:

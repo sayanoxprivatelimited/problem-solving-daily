@@ -1,7 +1,9 @@
-# problem-solving-daily
+# Sayanox Problem Solve Daily
 
-Real-world engineering problems, solved **end to end**: a written brief, runnable
-code, a test suite, and a CLI you can actually run.
+**Sayanox Problem Solve Daily** is the public practice log of
+[sayanoxprivatelimited](https://github.com/sayanoxprivatelimited): real-world
+engineering problems, solved **end to end** — a written brief, runnable code, a test
+suite, and a CLI you can actually run.
 
 Most practice repositories are algorithm puzzles. This one is the messy stuff you
 get paid for: a client's dirty CSV export, a tokenizer that must not lose a
@@ -11,8 +13,10 @@ assumptions — because that is the part that is hard in real work.
 
 **12 problems · 334 tests · 80 doctests · 6 categories · zero dependencies** (Python 3.10+)
 
-There is also a **3D showcase (search, detail sheet, light/dark theme) site** — four WebGL scenes built from the same data,
-no build step, no CDN: `make serve` → <http://localhost:8000>.
+Live site: **<https://problem-solving-daily.vercel.app>** — a **3D showcase** (four
+WebGL scenes, search, detail sheet, light/dark theme, shareable deep links) built from
+the same data, with no build step. Run it locally with `make serve` →
+<http://localhost:8000>.
 
 ---
 
@@ -23,15 +27,38 @@ no build step, no CDN: `make serve` → <http://localhost:8000>.
 | 1 | [Byte-pair encoding tokenizer](problems/ai/01-bpe-tokenizer/problem.md) | `ai` | 🔴 hard | lossless round-trip, merge ranks, deterministic training, save/load |
 | 2 | [Retrieval step for a docs assistant](problems/ai/02-retrieval-with-citations/problem.md) | `ai` | 🟡 medium | sentence-aware chunking, TF-IDF ranking, citations that slice the source |
 | 3 | [Per-key token bucket rate limiter](problems/backend/01-token-bucket-rate-limiter/problem.md) | `backend` | 🔴 hard | threads, injectable clock, LRU memory bound, `Retry-After` |
-| 4 | [File organizer with undo](problems/cli/01-file-organizer/problem.md) | `cli` | 🟡 medium | dry-run, collision-safe renames, manifest rollback, path-traversal guard |
-| 5 | [Build order from package manifests](problems/coding/01-build-order/problem.md) | `coding` | 🟡 medium | cycle reported as a path, alphabetical determinism, rebuild closure |
-| 6 | [Nginx access log report](problems/data/01-nginx-log-report/problem.md) | `data` | 🟡 medium | truncated lines must not break the report, nearest-rank p95 |
-| 7 | [Clean a messy sales export](problems/data/02-messy-csv-sales-report/problem.md) | `data` | 🟡 medium | duplicates, 3 date formats, `(120.00)` refunds, exact money |
-| 8 | [Incremental HTTP/1.1 parser](problems/network/01-incremental-http-parser/problem.md) | `network` | 🔴 hard | arbitrary TCP chunking, chunked encoding, smuggling defenses |
-| 9 | [CIDR planner for a VPC](problems/network/02-cidr-planner/problem.md) | `network` | 🟡 medium | subnet maths, overlap detection, prefix aggregation, stdlib parity |
+| 4 | [Lease-based lock with fencing tokens](problems/backend/02-lease-based-lock-with-fencing-tokens/problem.md) | `backend` | 🔴 hard | a stalled holder cannot write after its lease expired; fencing tokens at the store |
+| 5 | [File organizer with undo](problems/cli/01-file-organizer/problem.md) | `cli` | 🟡 medium | dry-run, collision-safe renames, manifest rollback, path-traversal guard |
+| 6 | [Build order from package manifests](problems/coding/01-build-order/problem.md) | `coding` | 🟡 medium | cycle reported as a path, alphabetical determinism, rebuild closure |
+| 7 | [Nginx access log report](problems/data/01-nginx-log-report/problem.md) | `data` | 🟡 medium | truncated lines must not break the report, nearest-rank p95 |
+| 8 | [Clean a messy sales export](problems/data/02-messy-csv-sales-report/problem.md) | `data` | 🟡 medium | duplicates, 3 date formats, `(120.00)` refunds, exact money |
+| 9 | [Sessionize an out-of-order event stream](problems/data/03-sessionize-an-out-of-order-event-stream/problem.md) | `data` | 🔴 hard | event time vs arrival time, watermarks, session windows, counted late drops |
+| 10 | [Incremental HTTP/1.1 parser](problems/network/01-incremental-http-parser/problem.md) | `network` | 🔴 hard | arbitrary TCP chunking, chunked encoding, smuggling defenses |
+| 11 | [CIDR planner for a VPC](problems/network/02-cidr-planner/problem.md) | `network` | 🟡 medium | subnet maths, overlap detection, prefix aggregation, stdlib parity |
+| 12 | [Retrying client with a circuit breaker](problems/network/03-retrying-client-with-a-circuit-breaker/problem.md) | `network` | 🔴 hard | exponential backoff with jitter, half-open probe, never retry a sent request |
 
 Generated table with links, concepts and per-category stats: **[catalog.md](catalog.md)**
 (regenerate with `python scripts/build_catalog.py`).
+
+## Findability (SEO & sharing)
+
+The showcase is meant to be found and forwarded, so the crawl-facing parts are
+generated instead of hand-maintained:
+
+| What | Where | Kept honest by |
+|---|---|---|
+| title, description, keywords, robots, canonical | `site/index.html` `<head>` | `site/tests/seo.test.mjs` |
+| Open Graph + Twitter card, 1200×630 preview | `site/assets/og-cover.jpg` | dimension check in the same test |
+| schema.org graph (WebSite, Organization, CollectionPage, ItemList of 12 `LearningResource`s) | generated block in `site/index.html` | `python scripts/build_seo.py --check` |
+| crawl policy + sitemap pointer | `site/robots.txt` | generated, checked |
+| canonical URL | `site/sitemap.xml` | generated, checked |
+| deep links (`?q=`, `?p=<slug>`, `#problem-<slug>`) | `site/js/main.js` | wiring tests + jsdom smoke |
+| share targets (X, LinkedIn, WhatsApp, Telegram, Reddit, copy-link, native share sheet) | footer + detail sheet | share test |
+
+```bash
+python scripts/build_seo.py          # rewrite robots.txt, sitemap.xml, JSON-LD
+python scripts/build_seo.py --check  # exit 1 when any of them is stale
+```
 
 ## Quick start
 

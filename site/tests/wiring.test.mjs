@@ -101,7 +101,7 @@ test('scenes load lazily so missing WebGL never blanks the page', () => {
   }
   assert.match(main, /function bootWhenVisible/, 'each scene must wait for its canvas');
   assert.match(main, /rootMargin: '400px 0px'/, 'boot slightly before the canvas is visible');
-  assert.match(main, /new IntersectionObserver/);
+  assert.match(main, /window\.IntersectionObserver/, 'read the constructor off window');
   assert.doesNotMatch(main, /startScenes\(data\)/, 'scenes no longer boot all at once');
 });
 
@@ -176,7 +176,7 @@ test('the numbers written into index.html match the generated catalogue', () => 
   const { stats } = JSON.parse(read('data/problems.json'));
   const html = read('index.html');
 
-  assert.match(html, new RegExp(`<title>[^<]*${stats.problems} real problems`));
+  assert.match(html, new RegExp(`<title>[^<]*${stats.problems} hard problems`));
   assert.match(
     html,
     new RegExp(`${stats.problems} problems, ${stats.categories} categories`),

@@ -1,0 +1,7 @@
+# Sayanox Problem Solve Daily — a 3D catalogue of real engineering problems.
+# https://github.com/sayanoxprivatelimited/problem-solving-daily
+User-agent: *
+Allow: /
+
+Sitemap: https://problem-solving-daily.vercel.app/sitemap.xml
+Host: problem-solving-daily.vercel.app
