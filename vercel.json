@@ -1,9 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "mkdir -p public && cp -r index.html robots.txt sitemap.xml css js data assets public/",
-  "installCommand": "",
-  "outputDirectory": "public",
+  "buildCommand": null,
+  "installCommand": null,
+  "outputDirectory": "site",
   "cleanUrls": false,
   "headers": [
     {
