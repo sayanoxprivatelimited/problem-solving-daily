@@ -38,6 +38,9 @@ REMOTE_DIST = ROOT / ".site-dist-remote"
 
 REPOSITORY = "sayanoxprivatelimited/problem-solving-daily"
 
+#: Canonical origin, matching SITE_URL in scripts/build_seo.py.
+SITE_URL = "https://problem-solving-daily.vercel.app"
+
 #: Files that belong in the browser-facing bundle, relative to ``site/``.
 PAYLOAD = (
     "index.html",
@@ -50,6 +53,11 @@ PAYLOAD = (
     "js/scenes/bars.js",
     "js/scenes/structure.js",
     "data/catalog.js",
+    "robots.txt",
+    "sitemap.xml",
+    "assets/icon.svg",
+    "assets/apple-touch-icon.png",
+    "assets/og-cover.jpg",
 )
 
 #: Same version as the vendored build, so local and deployed behaviour match.
@@ -112,6 +120,16 @@ def build_remote(ref: str) -> Path:
     for local, remote in (
         ('href="css/style.css"', f'href="{base}/css/style.css"'),
         ('src="js/main.js"', f'src="{base}/js/main.js"'),
+        ('href="assets/icon.svg"', f'href="{base}/assets/icon.svg"'),
+        (
+            'href="assets/apple-touch-icon.png"',
+            f'href="{base}/assets/apple-touch-icon.png"',
+        ),
+        # Link previews are fetched by crawlers, which need an absolute URL.
+        ('content="assets/og-cover.jpg"', f'content="{base}/assets/og-cover.jpg"'),
+        # The shell is the only file uploaded, so the sitemap is announced on the
+        # deployment's own domain rather than relative to a CDN path.
+        ('href="sitemap.xml"', f'href="{SITE_URL}/sitemap.xml"'),
     ):
         if local not in html:
             raise SystemExit(f"index.html no longer contains: {local}")
@@ -125,7 +143,14 @@ def build_remote(ref: str) -> Path:
         '    <link rel="preload" href="assets/three.module.js" as="script" crossorigin="anonymous" />',
         '    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin="anonymous" />',
     )
-    for stale in ('href="css/', 'src="js/', 'href="assets/', 'assets/three.module.js'):
+    for stale in (
+        'href="css/',
+        'src="js/',
+        'href="assets/',
+        'content="assets/',
+        'href="sitemap.xml"',
+        'assets/three.module.js',
+    ):
         if stale in html:
             raise SystemExit(f"remote shell still references a local file: {stale}")
 

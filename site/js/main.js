@@ -35,6 +35,10 @@ const sceneModules = {
 
 const THEME_KEY = 'psd-theme';
 
+/** The origin the canonical link names; every share URL is built from it. */
+const CANONICAL_URL = document.querySelector('link[rel="canonical"]')?.href
+  || `${window.location.origin}${window.location.pathname}`;
+
 const state = {
   problems: [],
   category: 'all',
@@ -170,7 +174,8 @@ function updateCount(visible) {
 function cardMarkup(problem) {
   const color = colorToCss(categoryColor(problem.category));
   return `
-        <article class="card" style="--cat: ${color}" data-index="${problem.index}">
+        <article class="card" id="problem-${problem.slug}" style="--cat: ${color}"
+          data-index="${problem.index}" data-slug="${problem.slug}">
           <header class="card__head">
             <span class="card__index">${String(problem.index).padStart(2, '0')}</span>
             <span class="badge">${prettyCategory(problem.category)}</span>
@@ -268,6 +273,7 @@ function paintSelection(index) {
 
 function selectProblem(problem) {
   state.selected = problem.index;
+  replaceUrl({ query: state.query, slug: problem.slug });
   paintSelection(problem.index);
   state.galaxy?.focus(problem.index);
   const card = document.querySelector(`.card[data-index="${problem.index}"]`);
@@ -338,6 +344,17 @@ function openDetail(index) {
   state.selected = problem.index;
   paintSelection(problem.index);
   state.galaxy?.focus(problem.index);
+
+  const share = document.getElementById('detail-share');
+  if (share) {
+    const url = urlFor({ slug: problem.slug });
+    share.href = shareTargets({
+      url,
+      text: `Sayanox Problem Solve Daily — ${problem.title}`,
+      title: problem.title,
+    }).x;
+  }
+  replaceUrl({ query: state.query, slug: problem.slug });
 
   if (sheet && typeof sheet.showModal === 'function') {
     if (!sheet.open) sheet.showModal();
@@ -431,12 +448,15 @@ async function bootScene(name, factory) {
 function bootWhenVisible(name, canvas, start) {
   if (!canvas) return;
 
-  if (!('IntersectionObserver' in window)) {
+  // Read the constructor off `window`: a bare `IntersectionObserver` is a
+  // ReferenceError anywhere the API is missing, and this page must survive that.
+  const Observer = window.IntersectionObserver;
+  if (typeof Observer !== 'function') {
     void bootScene(name, start);
     return;
   }
 
-  const observer = new IntersectionObserver(
+  const observer = new Observer(
     (entries) => {
       if (!entries.some((entry) => entry.isIntersecting)) return;
       observer.disconnect();
@@ -487,6 +507,7 @@ function clearFilters() {
   const input = document.getElementById('search');
   if (input) input.value = '';
   setCategory('all');
+  syncUrl(); // the ?q= that the empty state was reached through must go too
 }
 
 /** Move the selection through the cards currently on screen, wrapping at both ends. */
@@ -508,6 +529,164 @@ function moveSelection(direction) {
   target.focus();
 }
 
+/* ------------------------------------------------------------ deep links -- */
+/**
+ * The page state lives in the URL, so a share link opens the same view.
+ *
+ *   ?q=tokenizer      the search box, pre-filled
+ *   ?p=01-bpe-tokenizer   the detail sheet, open on that problem
+ *   #problem-<slug>   the card itself (an anchor, no script needed)
+ *
+ * `replaceState`, not `pushState`: typing in the search box must not fill the
+ * back button with one entry per keystroke.
+ */
+function urlFor({ query = '', slug = '' }) {
+  const url = new URL(window.location.href);
+  url.hash = '';
+  url.search = '';
+  if (query) url.searchParams.set('q', query);
+  if (slug) url.searchParams.set('p', slug);
+  return url.toString();
+}
+
+function replaceUrl(params) {
+  const next = urlFor(params);
+  if (next === window.location.href) return;
+  try {
+    window.history.replaceState(null, '', next);
+  } catch (error) {
+    /* file:// and sandboxed frames refuse this; the page still works */
+  }
+}
+
+function slugOf(index) {
+  return state.problems.find((problem) => problem.index === index)?.slug ?? '';
+}
+
+/** Write the current search + selection back into the address bar. */
+function syncUrl() {
+  replaceUrl({ query: state.query, slug: slugOf(state.selected) });
+}
+
+function applyDeepLink() {
+  const params = new URLSearchParams(window.location.search);
+  const query = (params.get('q') ?? '').trim();
+  if (query) {
+    state.query = query;
+    const input = document.getElementById('search');
+    if (input) input.value = query;
+    renderCards();
+  }
+
+  const hash = window.location.hash.startsWith('#problem-')
+    ? window.location.hash.slice('#problem-'.length)
+    : '';
+  const wanted = params.get('p') || hash;
+  if (!wanted) return;
+
+  const problem = state.problems.find(
+    (entry) => entry.slug === wanted || String(entry.index) === wanted,
+  );
+  if (!problem) return;
+
+  selectProblem(problem);
+  openDetail(problem.index);
+}
+
+/* ---------------------------------------------------------------- share -- */
+function shareSummary() {
+  const count = state.problems.length || 12;
+  return `Sayanox Problem Solve Daily — ${count} hard engineering problems, each with a brief, runnable Python and a test suite`;
+}
+
+function shareTargets({ url, text, title }) {
+  const link = encodeURIComponent(url);
+  const say = encodeURIComponent(`${text} ${url}`);
+  return {
+    x: `https://twitter.com/intent/tweet?url=${link}&text=${encodeURIComponent(text)}`,
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${link}`,
+    whatsapp: `https://wa.me/?text=${say}`,
+    telegram: `https://t.me/share/url?url=${link}&text=${encodeURIComponent(text)}`,
+    reddit: `https://www.reddit.com/submit?url=${link}&title=${encodeURIComponent(title)}`,
+  };
+}
+
+async function copyText(text) {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch (error) {
+    /* permission denied: fall through to the selection trick */
+  }
+  try {
+    const area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    area.style.position = 'fixed';
+    area.style.top = '-1000px';
+    document.body.append(area);
+    area.select();
+    const copied = typeof document.execCommand === 'function' && document.execCommand('copy');
+    area.remove();
+    return Boolean(copied);
+  } catch (error) {
+    return false;
+  }
+}
+
+function initShare() {
+  const note = document.getElementById('share-note');
+  const announce = (message) => {
+    if (note) note.textContent = message;
+  };
+
+  // The markup ships with static targets that already point at the live site;
+  // rewriting them here keeps previews and local runs on the right URL.
+  const targets = shareTargets({
+    url: CANONICAL_URL,
+    text: shareSummary(),
+    title: document.title,
+  });
+  for (const link of document.querySelectorAll('[data-share-net]')) {
+    const href = targets[link.dataset.shareNet];
+    if (href) link.href = href;
+  }
+
+  document.getElementById('copy-link')?.addEventListener('click', async () => {
+    const copied = await copyText(window.location.href);
+    announce(copied ? 'Link copied — paste it anywhere.' : 'Copy failed — select the address bar instead.');
+    replaceUrl({ query: state.query, slug: slugOf(state.selected) });
+  });
+
+  document.getElementById('hero-share')?.addEventListener('click', async () => {
+    const payload = {
+      title: document.title,
+      text: shareSummary(),
+      url: window.location.href,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(payload);
+        return;
+      } catch (error) {
+        /* the visitor closed the native sheet: fall through to a copy */
+      }
+    }
+    const copied = await copyText(payload.url);
+    announce(copied ? 'Link copied — paste it anywhere.' : 'Copy failed — select the address bar instead.');
+  });
+
+  document.getElementById('detail-copy')?.addEventListener('click', async () => {
+    const detailNote = document.getElementById('detail-note');
+    const copied = await copyText(urlFor({ slug: slugOf(state.selected) }));
+    if (detailNote) {
+      detailNote.textContent = copied ? 'Link copied' : 'Copy failed';
+    }
+  });
+}
+
 /* ------------------------------------------------------------------ init -- */
 async function bootstrap() {
   try {
@@ -526,7 +705,11 @@ async function bootstrap() {
     search?.addEventListener('input', () => {
       state.query = search.value.trim();
       renderCards();
+      syncUrl();
     });
+
+    initShare();
+    applyDeepLink();
 
     document.getElementById('detail-close')?.addEventListener('click', closeDetail);
     sheet?.addEventListener('click', (event) => {
