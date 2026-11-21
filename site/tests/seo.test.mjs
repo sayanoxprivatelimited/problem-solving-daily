@@ -115,7 +115,11 @@ test('robots.txt allows crawling and points at the sitemap', () => {
 
 test('every preview image is absolute-able, the right size, and on disk', () => {
   for (const key of ['og:image', 'twitter:image']) {
-    assert.equal(meta.get(key), 'assets/og-cover.jpg', `${key} must point at the committed cover`);
+    assert.equal(
+      meta.get(key),
+      `${SITE_URL}/assets/og-cover.jpg`,
+      `${key} must be absolute: link previews are fetched by crawlers, not browsers`,
+    );
   }
   assert.equal(meta.get('og:image:type'), 'image/jpeg');
   assert.equal(meta.get('og:image:width'), '1200');
@@ -272,7 +276,7 @@ test('the Python and JavaScript category labels agree', () => {
 
 test('the deployed shell never ships a relative asset or preview URL', () => {
   const build = fs.readFileSync(path.join(ROOT, 'scripts/build_site_deploy.py'), 'utf8');
-  for (const pattern of ['assets/icon.svg', 'assets/apple-touch-icon.png', 'content="assets/og-cover.jpg"']) {
+  for (const pattern of ['assets/icon.svg', 'assets/apple-touch-icon.png']) {
     assert.ok(build.includes(pattern), `build_site_deploy.py must rewrite ${pattern} to the CDN`);
   }
   assert.match(build, /content="assets\//, 'the remote build must reject a relative preview image');

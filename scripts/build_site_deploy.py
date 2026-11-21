@@ -125,8 +125,6 @@ def build_remote(ref: str) -> Path:
             'href="assets/apple-touch-icon.png"',
             f'href="{base}/assets/apple-touch-icon.png"',
         ),
-        # Link previews are fetched by crawlers, which need an absolute URL.
-        ('content="assets/og-cover.jpg"', f'content="{base}/assets/og-cover.jpg"'),
         # The shell is the only file uploaded, so the sitemap is announced on the
         # deployment's own domain rather than relative to a CDN path.
         ('href="sitemap.xml"', f'href="{SITE_URL}/sitemap.xml"'),
