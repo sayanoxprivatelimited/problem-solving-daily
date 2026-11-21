@@ -48,6 +48,7 @@ generated instead of hand-maintained:
 | What | Where | Kept honest by |
 |---|---|---|
 | title, description, keywords, robots, canonical | `site/index.html` `<head>` | `site/tests/seo.test.mjs` |
+| Google Search Console ownership token | `site/index.html` `<head>` | asserted verbatim by the same test |
 | Open Graph + Twitter card, 1200×630 preview | `site/assets/og-cover.jpg` | dimension check in the same test |
 | schema.org graph (WebSite, Organization, CollectionPage, ItemList of 12 `LearningResource`s) | generated block in `site/index.html` | `python scripts/build_seo.py --check` |
 | crawl policy + sitemap pointer | `site/robots.txt` | generated, checked |
