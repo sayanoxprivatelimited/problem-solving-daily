@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Build the upload bundle for the 3D site.
+"""Build the deployable bundles for the 3D site.
+
+The site is deployed from git (Vercel root directory `site/`, no build step), so
+`site/` is what production serves. This script exists for the two cases where a
+directory is not enough: a same-origin bundle with the import map untouched
+(`build()`), and the single-file shell for upload channels (`--remote-ref`).
 
 The site is committed as a static folder: every script imports the bare specifier
 ``three``, and ``site/index.html`` resolves it through an import map to the

@@ -184,18 +184,33 @@ DOM, and the page switches to its `no-webgl` styles.
 Live at **https://problem-solving-daily.vercel.app** (Vercel project
 `problem-solving-daily`, hobby plan).
 
-Two artifacts come out of `scripts/build_site_deploy.py`, because upload channels
-differ:
+The project is **connected to this repository** and its root directory is `site/`,
+so a deployment is a clone followed by nothing at all: `site/vercel.json` says
+`framework: null`, no build command, no install step, `outputDirectory: "."`. The
+files that were cloned *are* the site — same origin for the CSS, the scripts, the
+data and the 1.4 MB Three.js build, so there is no CDN pin to keep in sync.
+
+```bash
+git push origin main          # merge a PR
+# then one deployment, from the Vercel app:
+#   create_deployment(project=problem-solving-daily, git_source={type: github,
+#                     ref: main, repoId: 1465007432}, target: production)
+```
+
+Verification is by content, not by faith: `python3 scripts/build_site_deploy.py`
+still writes the exact bytes that are served (`.site-dist/` for the same-origin
+bundle), so `curl -s https://problem-solving-daily.vercel.app/ | sha1sum` can be
+compared with the file in the repository.
+
+`scripts/build_site_deploy.py` also keeps two upload-shaped artifacts as a fallback
+for channels that need them:
 
 | Target | Command | Contents |
 | --- | --- | --- |
-| Git / CI | `make site-bundle` | `.site-dist/` — 15 files, ~210 KB, import map rewritten to the pinned CDN copy of Three.js |
-| Upload API with a small inline limit | `make site-shell REF=<commit-sha>` | `.site-dist-remote/index.html` — one ~40 KB file that loads the CSS, scripts, icons and preview image from jsDelivr's GitHub mirror at that commit |
+| Same-origin bundle | `make site-bundle` | `.site-dist/` — the 15 files Vercel serves, import map unchanged |
+| Upload API with a small inline limit | `make site-shell REF=<commit-sha>` | `.site-dist-remote/index.html` — one ~52 KB file that loads the CSS, scripts, icons and preview image from jsDelivr's GitHub mirror at that commit |
 
-The deployed shell is pinned to a commit, so the page cannot change under you; to
-publish a new version, commit, push, then rebuild the shell with the new SHA and
-upload it again.
-
-A git-connected project (Vercel's GitHub integration) would remove the shell
-entirely: it would just build `site/` as a static root directory. The current
-project is file-upload based, which is why the shell exists.
+The shell is the older path, kept working on purpose: it pins the page to a commit
+and needs three files (`index.html`, `robots.txt`, `sitemap.xml`) in one upload. The
+git deployment makes it unnecessary, but a file-upload fallback is a useful thing to
+have when a repository connection breaks.
