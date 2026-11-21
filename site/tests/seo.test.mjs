@@ -79,6 +79,19 @@ test('the meta description is a full sentence-sized snippet', () => {
   assert.match(description, new RegExp(`${data.stats.tests} tests`), 'the counts must not drift');
 });
 
+test('the Search Console ownership token is present, verbatim', () => {
+  // Google compares this string byte for byte. An escaped underscore or a smart
+  // quote pasted out of a chat window is the classic way to fail verification
+  // while the tag looks correct to a human.
+  const token = '3ofxmu-_PcySytRPHqZFlIr4AkF-PH5WCz0iiCFzfa4';
+  assert.equal(meta.get('google-site-verification'), token);
+  assert.ok(
+    html.includes(`<meta name="google-site-verification" content="${token}" />`),
+    'the verification meta tag must be a plain, unescaped attribute',
+  );
+  assert.match(token, /^[A-Za-z0-9_-]{43}$/, 'the token shape Google issue');
+});
+
 test('the canonical URL, the Open Graph URL and the sitemap agree', () => {
   const canonical = html.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
   assert.equal(canonical, `${SITE_URL}/`);
