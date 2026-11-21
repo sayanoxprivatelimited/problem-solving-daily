@@ -183,6 +183,22 @@ test('the numbers written into index.html match the generated catalogue', () => 
     'the catalogue heading must be data-driven',
   );
   assert.match(html, new RegExp(`${stats.tests} tests, ${stats.doctests} doctests`));
+
+  // The share targets are percent-encoded, so they drift silently unless checked:
+  assert.ok(
+    html.includes(`${stats.problems}%20hard%20engineering%20problems`),
+    'the share text must carry the current problem count',
+  );
+  assert.match(
+    html,
+    new RegExp(`og:description"\\s+content="${stats.problems} hard engineering problems`),
+    'the Open Graph description must be data-driven',
+  );
+  assert.match(
+    html,
+    new RegExp(`twitter:description"\\s+content="${stats.problems} hard engineering problems`),
+    'the Twitter description must be data-driven',
+  );
 });
 
 test('index.html loads the module entry point and the stylesheet', () => {

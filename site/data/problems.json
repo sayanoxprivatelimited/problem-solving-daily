@@ -5,28 +5,28 @@
     "branch": "main"
   },
   "stats": {
-    "problems": 12,
-    "solved": 12,
+    "problems": 18,
+    "solved": 18,
     "categories": 6,
-    "tests": 334,
-    "doctests": 80,
-    "solution_lines": 3820,
+    "tests": 568,
+    "doctests": 184,
+    "solution_lines": 6653,
     "levels": {
       "easy": 0,
-      "medium": 6,
-      "hard": 6
+      "medium": 8,
+      "hard": 10
     }
   },
   "categories": [
     {
       "name": "ai",
-      "problems": 2,
-      "solved": 2
+      "problems": 3,
+      "solved": 3
     },
     {
       "name": "backend",
-      "problems": 2,
-      "solved": 2
+      "problems": 4,
+      "solved": 4
     },
     {
       "name": "cli",
@@ -35,18 +35,18 @@
     },
     {
       "name": "coding",
-      "problems": 1,
-      "solved": 1
+      "problems": 2,
+      "solved": 2
     },
     {
       "name": "data",
-      "problems": 3,
-      "solved": 3
+      "problems": 4,
+      "solved": 4
     },
     {
       "name": "network",
-      "problems": 3,
-      "solved": 3
+      "problems": 4,
+      "solved": 4
     }
   ],
   "problems": [
@@ -108,6 +108,34 @@
     },
     {
       "index": 3,
+      "slug": "03-evaluation-harness-with-regression-gates",
+      "category": "ai",
+      "title": "Evaluation harness with regression gates",
+      "level": "hard",
+      "status": "solved",
+      "concepts": [
+        "precision",
+        "recall",
+        "cost per 1k",
+        "regression gates",
+        "thresholds"
+      ],
+      "summary": "You ship a classifier that tags support tickets. Every change — a prompt tweak, a new model, a reranker — is judged by an \"eval\": run 400 labelled tickets, compute precision and recall, compare with yesterday, and…",
+      "criteria": [
+        "Labels are sets; precision and recall are micro-averaged over all cases",
+        "accuracy is exact match (predicted set == expected set)",
+        "A case with no predictions and no expectations counts as correct, not as a divide-by-zero",
+        "Cost is reported per 1,000 cases, not per run"
+      ],
+      "tests": 44,
+      "doctests": 23,
+      "solution_lines": 545,
+      "path": "problems/ai/03-evaluation-harness-with-regression-gates",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/ai/03-evaluation-harness-with-regression-gates/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/ai/03-evaluation-harness-with-regression-gates/solution/main.py"
+    },
+    {
+      "index": 4,
       "slug": "01-token-bucket-rate-limiter",
       "category": "backend",
       "title": "Per-key token bucket rate limiter",
@@ -135,7 +163,7 @@
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/backend/01-token-bucket-rate-limiter/solution/main.py"
     },
     {
-      "index": 4,
+      "index": 5,
       "slug": "02-lease-based-lock-with-fencing-tokens",
       "category": "backend",
       "title": "Lease-based lock with fencing tokens",
@@ -162,7 +190,63 @@
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/backend/02-lease-based-lock-with-fencing-tokens/solution/main.py"
     },
     {
-      "index": 5,
+      "index": 6,
+      "slug": "03-idempotency-keys-with-a-pluggable-store",
+      "category": "backend",
+      "title": "Idempotency keys with a pluggable store",
+      "level": "hard",
+      "status": "solved",
+      "concepts": [
+        "idempotency",
+        "replay",
+        "pluggable store",
+        "TTL",
+        "concurrency"
+      ],
+      "summary": "A mobile client sends POST /charges and the connection drops before the response arrives. The client retries — as it must, because it never learned whether the charge happened. Without help, the customer is charged…",
+      "criteria": [
+        "The fingerprint is a canonical hash of the payload (sorted keys), not the raw bytes",
+        "A replay returns the stored status and body, and does not call the handler again",
+        "The same key with a different fingerprint raises IdempotencyConflict and runs nothing",
+        "A handler that raises stores nothing, so a retry may execute again"
+      ],
+      "tests": 29,
+      "doctests": 17,
+      "solution_lines": 448,
+      "path": "problems/backend/03-idempotency-keys-with-a-pluggable-store",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/backend/03-idempotency-keys-with-a-pluggable-store/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/backend/03-idempotency-keys-with-a-pluggable-store/solution/main.py"
+    },
+    {
+      "index": 7,
+      "slug": "04-cursor-pagination-over-a-mutable-list",
+      "category": "backend",
+      "title": "Cursor pagination over a mutable list",
+      "level": "medium",
+      "status": "solved",
+      "concepts": [
+        "pagination",
+        "cursors",
+        "keyset",
+        "snapshots",
+        "tamper detection"
+      ],
+      "summary": "GET /invoices?page=3 looks harmless until the list changes underneath the reader. New invoices arrive between the first and second request, rows shift by one, and the client silently skips an invoice — or shows one…",
+      "criteria": [
+        "Ordering is (sort_key, id) and total: equal sort keys must never reorder",
+        "A cursor carries the last (sort_key, id) and the snapshot sequence",
+        "Rows inserted after the first page are invisible for the whole walk",
+        "The cursor is signed (HMAC-SHA256) and versioned"
+      ],
+      "tests": 35,
+      "doctests": 18,
+      "solution_lines": 410,
+      "path": "problems/backend/04-cursor-pagination-over-a-mutable-list",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/backend/04-cursor-pagination-over-a-mutable-list/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/backend/04-cursor-pagination-over-a-mutable-list/solution/main.py"
+    },
+    {
+      "index": 8,
       "slug": "01-file-organizer",
       "category": "cli",
       "title": "File organizer with undo",
@@ -190,7 +274,7 @@
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/cli/01-file-organizer/solution/main.py"
     },
     {
-      "index": 6,
+      "index": 9,
       "slug": "01-build-order",
       "category": "coding",
       "title": "Build order from package manifests",
@@ -217,7 +301,35 @@
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/coding/01-build-order/solution/main.py"
     },
     {
-      "index": 7,
+      "index": 10,
+      "slug": "02-unified-diff-and-patch-engine",
+      "category": "coding",
+      "title": "Unified diff and patch engine",
+      "level": "hard",
+      "status": "solved",
+      "concepts": [
+        "diff",
+        "Myers algorithm",
+        "hunks",
+        "patch application",
+        "fuzz testing"
+      ],
+      "summary": "Code review, deployments and three-way merges all rest on one primitive: given two versions of a text file, produce the shortest sensible description of the change, in the format every tool already speaks — a unified…",
+      "criteria": [
+        "The edit script is minimal: Myers' shortest edit script, not an LCS table",
+        "Hunks carry context unchanged lines on each side, and merge when their context would overlap",
+        "A last line without a newline is marked with \\ No newline at end of file on both sides",
+        "apply_patch tolerates a shifted hunk (line numbers drifted) by searching, but only applies an exact match"
+      ],
+      "tests": 38,
+      "doctests": 20,
+      "solution_lines": 528,
+      "path": "problems/coding/02-unified-diff-and-patch-engine",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/coding/02-unified-diff-and-patch-engine/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/coding/02-unified-diff-and-patch-engine/solution/main.py"
+    },
+    {
+      "index": 11,
       "slug": "01-nginx-log-report",
       "category": "data",
       "title": "Nginx access log report",
@@ -244,7 +356,7 @@
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/01-nginx-log-report/solution/main.py"
     },
     {
-      "index": 8,
+      "index": 12,
       "slug": "02-messy-csv-sales-report",
       "category": "data",
       "title": "Clean a messy sales export",
@@ -272,7 +384,7 @@
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/02-messy-csv-sales-report/solution/main.py"
     },
     {
-      "index": 9,
+      "index": 13,
       "slug": "03-sessionize-an-out-of-order-event-stream",
       "category": "data",
       "title": "Sessionize an out-of-order event stream",
@@ -299,7 +411,35 @@
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/03-sessionize-an-out-of-order-event-stream/solution/main.py"
     },
     {
-      "index": 10,
+      "index": 14,
+      "slug": "04-streaming-dedupe-of-a-huge-jsonl-file",
+      "category": "data",
+      "title": "Streaming dedupe of a huge JSONL file",
+      "level": "medium",
+      "status": "solved",
+      "concepts": [
+        "streaming",
+        "external memory",
+        "hashing",
+        "sharding",
+        "bounded memory"
+      ],
+      "summary": "An analytics dump holds 40 million JSONL records, and 12% of them are the same event delivered twice. The obvious fix —",
+      "criteria": [
+        "Order is preserved: the first occurrence of every key survives, in input order",
+        "Memory is bounded by max_keys_in_memory, not by the input size",
+        "A shard that still does not fit is re-sharded recursively, not loaded anyway",
+        "Duplicates are detected across shards — the hash decides placement, never the value"
+      ],
+      "tests": 32,
+      "doctests": 10,
+      "solution_lines": 402,
+      "path": "problems/data/04-streaming-dedupe-of-a-huge-jsonl-file",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/04-streaming-dedupe-of-a-huge-jsonl-file/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/04-streaming-dedupe-of-a-huge-jsonl-file/solution/main.py"
+    },
+    {
+      "index": 15,
       "slug": "01-incremental-http-parser",
       "category": "network",
       "title": "Incremental HTTP/1.1 request parser",
@@ -327,7 +467,7 @@
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/01-incremental-http-parser/solution/main.py"
     },
     {
-      "index": 11,
+      "index": 16,
       "slug": "02-cidr-planner",
       "category": "network",
       "title": "CIDR planner for a VPC",
@@ -354,7 +494,7 @@
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/02-cidr-planner/solution/main.py"
     },
     {
-      "index": 12,
+      "index": 17,
       "slug": "03-retrying-client-with-a-circuit-breaker",
       "category": "network",
       "title": "Retrying client with a circuit breaker",
@@ -379,6 +519,35 @@
       "path": "problems/network/03-retrying-client-with-a-circuit-breaker",
       "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/03-retrying-client-with-a-circuit-breaker/problem.md",
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/03-retrying-client-with-a-circuit-breaker/solution/main.py"
+    },
+    {
+      "index": 18,
+      "slug": "04-websocket-frame-decoder",
+      "category": "network",
+      "title": "WebSocket frame decoder",
+      "level": "hard",
+      "status": "solved",
+      "concepts": [
+        "RFC 6455",
+        "framing",
+        "incremental parsing",
+        "masking",
+        "fragmentation",
+        "UTF-8"
+      ],
+      "summary": "A WebSocket is a TCP stream with framing on top. Two facts make a decoder hard, and both are invisible until production:",
+      "criteria": [
+        "Feed bytes incrementally; a partial frame is buffered, never misparsed",
+        "Payload lengths use 126/127 extended forms, and the shortest form is enforced",
+        "Masked payloads are unmasked with the 4-byte key; masking policy is configurable",
+        "Fragments are reassembled (opcode 0), with control frames allowed in between"
+      ],
+      "tests": 56,
+      "doctests": 16,
+      "solution_lines": 500,
+      "path": "problems/network/04-websocket-frame-decoder",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/04-websocket-frame-decoder/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/04-websocket-frame-decoder/solution/main.py"
     }
   ]
 }

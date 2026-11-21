@@ -1,0 +1,7 @@
+[
+  {"id": "inv-3", "sort_key": 100, "payload": "March"},
+  {"id": "inv-1", "sort_key": 100, "payload": "March"},
+  {"id": "inv-2", "sort_key": 101, "payload": "April"},
+  {"id": "inv-5", "sort_key": 102, "payload": "May"},
+  {"id": "inv-4", "sort_key": 103, "payload": "June"}
+]

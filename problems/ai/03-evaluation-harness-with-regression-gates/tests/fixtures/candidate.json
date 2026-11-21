@@ -1,0 +1,10 @@
+{
+  "suite": "support-triage-v4",
+  "cases": [
+    {"id": "t1", "expected": ["billing"], "predicted": ["billing"], "cost_usd": 0.0011},
+    {"id": "t2", "expected": ["billing", "urgent"], "predicted": ["billing", "urgent"], "cost_usd": 0.0011},
+    {"id": "t3", "expected": ["account"], "predicted": ["account"], "cost_usd": 0.0011},
+    {"id": "t4", "expected": ["shipping"], "predicted": ["billing"], "cost_usd": 0.0011},
+    {"id": "t5", "expected": ["account"], "predicted": [], "cost_usd": 0.0011}
+  ]
+}

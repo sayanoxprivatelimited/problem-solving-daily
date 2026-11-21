@@ -11,7 +11,7 @@ whitespace, an HTTP parser that must survive hostile chunking, a rate limiter th
 must hold under eight threads. Every problem states its constraints and its
 assumptions — because that is the part that is hard in real work.
 
-**12 problems · 334 tests · 80 doctests · 6 categories · zero dependencies** (Python 3.10+)
+**18 problems · 568 tests · 184 doctests · 6 categories · zero dependencies** (Python 3.10+)
 
 Live site: **<https://problem-solving-daily.vercel.app>** — a **3D showcase** (four
 WebGL scenes, search, detail sheet, light/dark theme, shareable deep links) built from
@@ -36,6 +36,12 @@ the same data, with no build step. Run it locally with `make serve` →
 | 10 | [Incremental HTTP/1.1 parser](problems/network/01-incremental-http-parser/problem.md) | `network` | 🔴 hard | arbitrary TCP chunking, chunked encoding, smuggling defenses |
 | 11 | [CIDR planner for a VPC](problems/network/02-cidr-planner/problem.md) | `network` | 🟡 medium | subnet maths, overlap detection, prefix aggregation, stdlib parity |
 | 12 | [Retrying client with a circuit breaker](problems/network/03-retrying-client-with-a-circuit-breaker/problem.md) | `network` | 🔴 hard | exponential backoff with jitter, half-open probe, never retry a sent request |
+| 13 | [Evaluation harness with regression gates](problems/ai/03-evaluation-harness-with-regression-gates/problem.md) | `ai` | 🔴 hard | precision/recall/cost per 1k, floors and allowed regression, a verdict you can gate CI on |
+| 14 | [Idempotency keys with a pluggable store](problems/backend/03-idempotency-keys-with-a-pluggable-store/problem.md) | `backend` | 🔴 hard | same key + different body is a conflict, a crash does not poison the key, TTL, in-flight guard |
+| 15 | [Cursor pagination over a mutable list](problems/backend/04-cursor-pagination-over-a-mutable-list/problem.md) | `backend` | 🟡 medium | keyset + snapshot cursors, signed and versioned, no skips when rows are inserted mid-walk |
+| 16 | [Unified diff and patch engine](problems/coding/02-unified-diff-and-patch-engine/problem.md) | `coding` | 🔴 hard | Myers O(ND), hunk merging, no-newline markers, drift-tolerant application that refuses a partial patch |
+| 17 | [Streaming dedupe of a huge JSONL file](problems/data/04-streaming-dedupe-of-a-huge-jsonl-file/problem.md) | `data` | 🟡 medium | bounded memory, hash sharding with recursive re-shard, input order preserved |
+| 18 | [WebSocket frame decoder](problems/network/04-websocket-frame-decoder/problem.md) | `network` | 🔴 hard | arbitrary chunking, masking, fragmentation, control frames, close codes 1002/1007/1009 |
 
 Generated table with links, concepts and per-category stats: **[catalog.md](catalog.md)**
 (regenerate with `python scripts/build_catalog.py`).
@@ -50,7 +56,7 @@ generated instead of hand-maintained:
 | title, description, keywords, robots, canonical | `site/index.html` `<head>` | `site/tests/seo.test.mjs` |
 | Google Search Console ownership token | `site/index.html` `<head>` | asserted verbatim by the same test |
 | Open Graph + Twitter card, 1200×630 preview | `site/assets/og-cover.jpg` | dimension check in the same test |
-| schema.org graph (WebSite, Organization, CollectionPage, ItemList of 12 `LearningResource`s) | generated block in `site/index.html` | `python scripts/build_seo.py --check` |
+| schema.org graph (WebSite, Organization, CollectionPage, ItemList of 18 `LearningResource`s) | generated block in `site/index.html` | `python scripts/build_seo.py --check` |
 | crawl policy + sitemap pointer | `site/robots.txt` | generated, checked |
 | canonical URL | `site/sitemap.xml` | generated, checked |
 | deep links (`?q=`, `?p=<slug>`, `#problem-<slug>`) | `site/js/main.js` | wiring tests + jsdom smoke |
@@ -183,12 +189,15 @@ purpose**: you start from red, describe the behaviour, then make it green.
 
 ## Roadmap (planned problems)
 
-- `data/03` — streaming dedupe of a 10 GB JSONL file in constant memory
-- `backend/02` — idempotency keys with a pluggable store
-- `backend/03` — cursor pagination over a mutable list
-- `network/03` — WebSocket frame decoder (masking, fragmentation, control frames)
-- `ai/03` — evaluation harness: precision/recall, cost per 1k requests, regressions
-- `coding/02` — unified diff / patch engine
+The six entries that used to be listed here are solved (see the catalogue above).
+Next up, in the same style — a brief, a runnable solution, a CLI and a test suite:
+
+- `ai/04` — prompt-budget packer: fit the most useful context into a token window
+- `backend/05` — transactional outbox with at-least-once delivery and consumer dedupe
+- `cli/02` — a `--watch` runner: debounce, incremental rebuild, clean shutdown
+- `coding/03` — JSON Schema validator that reports a path for every failure
+- `data/05` — external sort of a file larger than memory, with a stable tie-break
+- `network/05` — DNS resolver cache: TTL, negative caching, CNAME chains
 
 ## License
 
