@@ -261,6 +261,37 @@ def render_sitemap(data: dict) -> str:
     )
 
 
+#: Count-bearing phrases that live *outside* the generated JSON-LD block: the
+#: <title>, the meta descriptions, the visible headline, the snippet in the "how to
+#: run" card and the percent-encoded share targets. Keeping them here means a new
+#: problem can never leave the page advertising last week's test count.
+COUNT_PATTERNS = (
+    (r"\b\d+(?= hard engineering problems)", "problems"),
+    (r"\b\d+(?= hard problems)", "problems"),
+    (r"\b\d+(?= engineering problems)", "problems"),
+    (r"\b\d+(?= problems, )", "problems"),
+    (r"\b\d+(?= problems across )", "problems"),
+    (r"(?<= problems, )\d+", "categories"),
+    (r"(?<= across )\d+(?= categories)", "categories"),
+    (r"\b\d+(?= tests\b)", "tests"),
+    (r"\b\d+(?= doctests\b)", "doctests"),
+    # Percent-encoded share targets: no \b here, "%20" and the digits are all
+    # word characters, so a boundary never exists between them. The lookbehind
+    # anchors on the encoded space, otherwise "%2012" would be read as "2012".
+    (r"(?<=%20)\d+(?=%20hard%20engineering%20problems)", "problems"),
+    (r"(?<=%20)\d+(?=%20hard%20problems)", "problems"),
+    (r"(?<=%20)\d+(?=%20tests\b)", "tests"),
+    (r"(?<=%20)\d+(?=%20doctests\b)", "doctests"),
+)
+
+
+def refresh_counts(html: str, stats: dict) -> str:
+    """Rewrite every stale count outside the JSON-LD block, idempotently."""
+    for pattern, key in COUNT_PATTERNS:
+        html = re.sub(pattern, str(stats[key]), html)
+    return html
+
+
 def render_index(current: str, data: dict) -> str:
     if MARKER_START not in current or MARKER_END not in current:
         raise SystemExit(
@@ -268,7 +299,11 @@ def render_index(current: str, data: dict) -> str:
         )
     head, rest = current.split(MARKER_START, 1)
     _, tail = rest.split(MARKER_END, 1)
-    return head + render_jsonld(data) + tail
+    return (
+        refresh_counts(head, data["stats"])
+        + render_jsonld(data)
+        + refresh_counts(tail, data["stats"])
+    )
 
 
 # ------------------------------------------------------------------ main -- #
