@@ -409,8 +409,17 @@ function showTooltip(problem, point) {
     tooltip.hidden = true;
     return;
   }
+  // A hover payload may be a bar entry rather than a problem record, so every
+  // part is optional: a missing level must not print "undefined".
+  const meta = [
+    prettyCategory(problem.category),
+    problem.level,
+    `${problem.tests} tests`,
+  ]
+    .filter(Boolean)
+    .join(' · ');
   tooltip.innerHTML = `<strong>${problem.title}</strong>
-    <span>${prettyCategory(problem.category)} · ${problem.level} · ${problem.tests} tests</span>`;
+    <span>${meta}</span>`;
   tooltip.hidden = false;
   tooltip.style.left = `${point.x}px`;
   tooltip.style.top = `${point.y}px`;

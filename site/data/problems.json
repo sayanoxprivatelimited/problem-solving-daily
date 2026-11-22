@@ -5,16 +5,16 @@
     "branch": "main"
   },
   "stats": {
-    "problems": 18,
-    "solved": 18,
+    "problems": 19,
+    "solved": 19,
     "categories": 6,
-    "tests": 568,
-    "doctests": 184,
-    "solution_lines": 6653,
+    "tests": 634,
+    "doctests": 207,
+    "solution_lines": 7216,
     "levels": {
       "easy": 0,
       "medium": 8,
-      "hard": 10
+      "hard": 11
     }
   },
   "categories": [
@@ -30,8 +30,8 @@
     },
     {
       "name": "cli",
-      "problems": 1,
-      "solved": 1
+      "problems": 2,
+      "solved": 2
     },
     {
       "name": "coding",
@@ -275,6 +275,34 @@
     },
     {
       "index": 9,
+      "slug": "02-layered-configuration-resolution",
+      "category": "cli",
+      "title": "Layered configuration resolution",
+      "level": "hard",
+      "status": "solved",
+      "concepts": [
+        "config precedence",
+        "dotenv parsing",
+        "type coercion",
+        "provenance",
+        "masking"
+      ],
+      "summary": "An API works locally and connects to the wrong database in production. Nobody is lying: db.host is in the repo's config.env, in a Kubernetes ConfigMap, in the deployment's env: block, and on the command line of the…",
+      "criteria": [
+        "Precedence is exactly flag > env > file > default",
+        "Every resolved value carries its origin: default, file:<name>:<line>, env:<VAR>, flag:<--flag>",
+        "A bad value fails with the origin in the message",
+        "An unknown key in the file or on the command line is an error, with a suggestion"
+      ],
+      "tests": 66,
+      "doctests": 23,
+      "solution_lines": 563,
+      "path": "problems/cli/02-layered-configuration-resolution",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/cli/02-layered-configuration-resolution/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/cli/02-layered-configuration-resolution/solution/main.py"
+    },
+    {
+      "index": 10,
       "slug": "01-build-order",
       "category": "coding",
       "title": "Build order from package manifests",
@@ -301,7 +329,7 @@
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/coding/01-build-order/solution/main.py"
     },
     {
-      "index": 10,
+      "index": 11,
       "slug": "02-unified-diff-and-patch-engine",
       "category": "coding",
       "title": "Unified diff and patch engine",
@@ -329,7 +357,7 @@
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/coding/02-unified-diff-and-patch-engine/solution/main.py"
     },
     {
-      "index": 11,
+      "index": 12,
       "slug": "01-nginx-log-report",
       "category": "data",
       "title": "Nginx access log report",
@@ -356,7 +384,7 @@
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/01-nginx-log-report/solution/main.py"
     },
     {
-      "index": 12,
+      "index": 13,
       "slug": "02-messy-csv-sales-report",
       "category": "data",
       "title": "Clean a messy sales export",
@@ -384,7 +412,7 @@
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/02-messy-csv-sales-report/solution/main.py"
     },
     {
-      "index": 13,
+      "index": 14,
       "slug": "03-sessionize-an-out-of-order-event-stream",
       "category": "data",
       "title": "Sessionize an out-of-order event stream",
@@ -411,7 +439,7 @@
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/03-sessionize-an-out-of-order-event-stream/solution/main.py"
     },
     {
-      "index": 14,
+      "index": 15,
       "slug": "04-streaming-dedupe-of-a-huge-jsonl-file",
       "category": "data",
       "title": "Streaming dedupe of a huge JSONL file",
@@ -439,7 +467,7 @@
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/04-streaming-dedupe-of-a-huge-jsonl-file/solution/main.py"
     },
     {
-      "index": 15,
+      "index": 16,
       "slug": "01-incremental-http-parser",
       "category": "network",
       "title": "Incremental HTTP/1.1 request parser",
@@ -467,7 +495,7 @@
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/01-incremental-http-parser/solution/main.py"
     },
     {
-      "index": 16,
+      "index": 17,
       "slug": "02-cidr-planner",
       "category": "network",
       "title": "CIDR planner for a VPC",
@@ -494,7 +522,7 @@
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/02-cidr-planner/solution/main.py"
     },
     {
-      "index": 17,
+      "index": 18,
       "slug": "03-retrying-client-with-a-circuit-breaker",
       "category": "network",
       "title": "Retrying client with a circuit breaker",
@@ -521,7 +549,7 @@
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/03-retrying-client-with-a-circuit-breaker/solution/main.py"
     },
     {
-      "index": 18,
+      "index": 19,
       "slug": "04-websocket-frame-decoder",
       "category": "network",
       "title": "WebSocket frame decoder",
