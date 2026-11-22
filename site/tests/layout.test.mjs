@@ -112,6 +112,15 @@ test('bars scale with the test count and keep a floor', () => {
   assert.ok(Math.abs(centre) < 1e-9);
 });
 
+test('every bar carries the fields the hover tooltip prints', () => {
+  for (const bar of barLayout(problems)) {
+    assert.equal(typeof bar.title, 'string');
+    assert.equal(typeof bar.category, 'string');
+    assert.ok(['hard', 'medium', 'easy'].includes(bar.level), `${bar.title} has no level`);
+    assert.equal(typeof bar.tests, 'number');
+  }
+});
+
 test('bars are spaced apart so they never intersect', () => {
   const bars = barLayout(problems);
   for (let index = 1; index < bars.length; index += 1) {

@@ -11,7 +11,7 @@ whitespace, an HTTP parser that must survive hostile chunking, a rate limiter th
 must hold under eight threads. Every problem states its constraints and its
 assumptions — because that is the part that is hard in real work.
 
-**18 problems · 568 tests · 184 doctests · 6 categories · zero dependencies** (Python 3.10+)
+**19 problems · 632 tests · 207 doctests · 6 categories · zero dependencies** (Python 3.10+)
 
 Live site: **<https://problem-solving-daily.vercel.app>** — a **3D showcase** (four
 WebGL scenes, search, detail sheet, light/dark theme, shareable deep links) built from
