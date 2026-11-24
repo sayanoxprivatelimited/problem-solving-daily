@@ -29,6 +29,33 @@ function walk(directory) {
     });
 }
 
+const html = read('index.html');
+const catalog = JSON.parse(read('data/problems.json'));
+
+/** Every number in the markup that the SEO script is supposed to maintain. */
+function countMatches(pattern) {
+  return [...html.matchAll(pattern)].map((match) => Number(match[1]));
+}
+
+test('every count in the prose follows the catalogue, even across a line break', () => {
+  // The hero lede wraps mid-sentence, which is exactly how "19 hard engineering
+  // problems" survived a catalogue of twenty: the count regex demanded a literal
+  // space.
+  const prose = [
+    /(\d+)\s+hard\s+engineering\s+problems/g,
+    /(\d+)\s+hard\s+problems/g,
+    /(\d+)\s+problems,\s+\d+\s+categories/g,
+  ];
+  for (const pattern of prose) {
+    const found = countMatches(pattern);
+    assert.ok(found.length > 0, `no match for ${pattern}`);
+    for (const number of found) {
+      if (pattern.source.includes('categories')) continue; // guarded elsewhere
+      assert.equal(number, catalog.stats.problems, `${pattern} says ${number}`);
+    }
+  }
+});
+
 const scriptFiles = walk('js').filter((file) => file.endsWith('.js'));
 const sources = new Map(scriptFiles.map((file) => [file, read(file)]));
 

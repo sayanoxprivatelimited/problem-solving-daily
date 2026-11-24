@@ -266,9 +266,12 @@ def render_sitemap(data: dict) -> str:
 #: run" card and the percent-encoded share targets. Keeping them here means a new
 #: problem can never leave the page advertising last week's test count.
 COUNT_PATTERNS = (
-    (r"\b\d+(?= hard engineering problems)", "problems"),
-    (r"\b\d+(?= hard problems)", "problems"),
-    (r"\b\d+(?= engineering problems)", "problems"),
+    # \s+ instead of a literal space: the hero lede wraps its sentence, and a
+    # count that only matches when the line happens not to break is a count that
+    # goes stale silently.
+    (r"\b\d+(?=\s+hard\s+engineering\s+problems)", "problems"),
+    (r"\b\d+(?=\s+hard\s+problems)", "problems"),
+    (r"\b\d+(?=\s+engineering\s+problems)", "problems"),
     (r"\b\d+(?= problems, )", "problems"),
     (r"\b\d+(?= problems across )", "problems"),
     (r"(?<= problems, )\d+", "categories"),
