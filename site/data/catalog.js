@@ -7,16 +7,16 @@ export default {
     "branch": "main"
   },
   "stats": {
-    "problems": 19,
-    "solved": 19,
+    "problems": 20,
+    "solved": 20,
     "categories": 6,
-    "tests": 634,
-    "doctests": 207,
-    "solution_lines": 7216,
+    "tests": 700,
+    "doctests": 228,
+    "solution_lines": 8125,
     "levels": {
       "easy": 0,
       "medium": 8,
-      "hard": 11
+      "hard": 12
     }
   },
   "categories": [
@@ -37,8 +37,8 @@ export default {
     },
     {
       "name": "coding",
-      "problems": 2,
-      "solved": 2
+      "problems": 3,
+      "solved": 3
     },
     {
       "name": "data",
@@ -360,6 +360,34 @@ export default {
     },
     {
       "index": 12,
+      "slug": "03-a-regex-engine-with-bounded-backtracking",
+      "category": "coding",
+      "title": "A regex engine with bounded backtracking",
+      "level": "hard",
+      "status": "solved",
+      "concepts": [
+        "parser",
+        "Thompson NFA",
+        "backtracking",
+        "capture groups",
+        "ReDoS budgets"
+      ],
+      "summary": "re is one import away, and it is still the wrong answer here, because the interesting part is not \"match a string\" — it is *what the engine does when the pattern is hostile*.",
+      "criteria": [
+        "A hand-written recursive-descent parser: alternation → concatenation → repeat → atom",
+        "Quantifiers are greedy by default and lazy with a trailing ?",
+        "Leftmost match wins, and among equals the leftmost *branch* wins",
+        "Capturing groups are numbered by opening parenthesis; (?:...) does not shift them"
+      ],
+      "tests": 66,
+      "doctests": 21,
+      "solution_lines": 909,
+      "path": "problems/coding/03-a-regex-engine-with-bounded-backtracking",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/coding/03-a-regex-engine-with-bounded-backtracking/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/coding/03-a-regex-engine-with-bounded-backtracking/solution/main.py"
+    },
+    {
+      "index": 13,
       "slug": "01-nginx-log-report",
       "category": "data",
       "title": "Nginx access log report",
@@ -386,7 +414,7 @@ export default {
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/01-nginx-log-report/solution/main.py"
     },
     {
-      "index": 13,
+      "index": 14,
       "slug": "02-messy-csv-sales-report",
       "category": "data",
       "title": "Clean a messy sales export",
@@ -414,7 +442,7 @@ export default {
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/02-messy-csv-sales-report/solution/main.py"
     },
     {
-      "index": 14,
+      "index": 15,
       "slug": "03-sessionize-an-out-of-order-event-stream",
       "category": "data",
       "title": "Sessionize an out-of-order event stream",
@@ -441,7 +469,7 @@ export default {
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/03-sessionize-an-out-of-order-event-stream/solution/main.py"
     },
     {
-      "index": 15,
+      "index": 16,
       "slug": "04-streaming-dedupe-of-a-huge-jsonl-file",
       "category": "data",
       "title": "Streaming dedupe of a huge JSONL file",
@@ -469,7 +497,7 @@ export default {
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/04-streaming-dedupe-of-a-huge-jsonl-file/solution/main.py"
     },
     {
-      "index": 16,
+      "index": 17,
       "slug": "01-incremental-http-parser",
       "category": "network",
       "title": "Incremental HTTP/1.1 request parser",
@@ -497,7 +525,7 @@ export default {
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/01-incremental-http-parser/solution/main.py"
     },
     {
-      "index": 17,
+      "index": 18,
       "slug": "02-cidr-planner",
       "category": "network",
       "title": "CIDR planner for a VPC",
@@ -524,7 +552,7 @@ export default {
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/02-cidr-planner/solution/main.py"
     },
     {
-      "index": 18,
+      "index": 19,
       "slug": "03-retrying-client-with-a-circuit-breaker",
       "category": "network",
       "title": "Retrying client with a circuit breaker",
@@ -551,7 +579,7 @@ export default {
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/03-retrying-client-with-a-circuit-breaker/solution/main.py"
     },
     {
-      "index": 19,
+      "index": 20,
       "slug": "04-websocket-frame-decoder",
       "category": "network",
       "title": "WebSocket frame decoder",

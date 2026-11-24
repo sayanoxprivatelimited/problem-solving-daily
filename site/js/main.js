@@ -13,9 +13,15 @@ import {
   formatNumber,
   matchesQuery,
   prettyCategory,
+  progressSummary,
+  relatedProblems,
+  relationLabel,
   stepIndex,
   summarize,
+  toggleSolved,
 } from './layout.js';
+import { initPalette } from './palette.js';
+import { loadSolved, saveSolved } from './progress.js';
 
 /**
  * Every scene is imported lazily, on purpose.
@@ -41,11 +47,15 @@ const CANONICAL_URL = document.querySelector('link[rel="canonical"]')?.href
 
 const state = {
   problems: [],
+  categories: [],
   category: 'all',
   query: '',
   selected: null,
   galaxy: null,
   theme: 'dark',
+  solved: new Set(),
+  unsolvedOnly: false,
+  palette: null,
 };
 
 const tooltip = document.getElementById('tooltip');
@@ -155,9 +165,47 @@ function renderFilters(categories) {
 }
 
 function visibleProblems() {
-  return filterProblems(state.problems, state.category).filter((problem) =>
-    matchesQuery(problem, state.query),
-  );
+  return filterProblems(state.problems, state.category)
+    .filter((problem) => (state.unsolvedOnly ? !state.solved.has(problem.slug) : true))
+    .filter((problem) => matchesQuery(problem, state.query));
+}
+
+/* --------------------------------------------------------------- progress -- */
+function renderProgress() {
+  const summary = progressSummary(state.problems, state.solved);
+
+  const text = document.getElementById('progress-text');
+  if (text) text.textContent = `${summary.solved} of ${summary.total} solved`;
+
+  const bar = document.getElementById('progress-bar');
+  if (bar) {
+    bar.style.width = `${summary.percent}%`;
+    bar.parentElement?.setAttribute('aria-valuenow', String(summary.percent));
+  }
+
+  const toggle = document.getElementById('unsolved-toggle');
+  if (toggle) {
+    toggle.setAttribute('aria-pressed', String(state.unsolvedOnly));
+    const label = toggle.querySelector('[data-count]');
+    if (label) label.textContent = String(summary.remaining);
+  }
+
+  for (const card of document.querySelectorAll('.card[data-slug]')) {
+    const solved = state.solved.has(card.dataset.slug);
+    card.classList.toggle('is-solved', solved);
+    const button = card.querySelector('[data-solve]');
+    if (button) {
+      button.setAttribute('aria-pressed', String(solved));
+      button.textContent = solved ? 'Solved ✓' : 'Mark solved';
+    }
+  }
+}
+
+function setSolved(slug, solved) {
+  state.solved = solved ? new Set([...state.solved, slug]) : new Set([...state.solved].filter((item) => item !== slug));
+  saveSolved(state.solved);
+  renderProgress();
+  renderCards();
 }
 
 function updateCount(visible) {
@@ -174,7 +222,8 @@ function updateCount(visible) {
 function cardMarkup(problem) {
   const color = colorToCss(categoryColor(problem.category));
   return `
-        <article class="card" id="problem-${problem.slug}" style="--cat: ${color}"
+        <article class="card${state.solved.has(problem.slug) ? ' is-solved' : ''}"
+          id="problem-${problem.slug}" style="--cat: ${color}"
           data-index="${problem.index}" data-slug="${problem.slug}">
           <header class="card__head">
             <span class="card__index">${String(problem.index).padStart(2, '0')}</span>
@@ -190,6 +239,10 @@ function cardMarkup(problem) {
             <span>${problem.tests} tests</span>
             <span>${problem.doctests} doctests</span>
             <button class="card__more" type="button" data-detail="${problem.index}">Details</button>
+            <button class="card__solved" type="button" data-solve="${problem.slug}"
+              aria-pressed="${state.solved.has(problem.slug)}">${
+                state.solved.has(problem.slug) ? 'Solved ✓' : 'Mark solved'
+              }</button>
             <a href="${problem.code_url}" target="_blank" rel="noreferrer">code ↗</a>
           </footer>
         </article>`;
@@ -339,6 +392,34 @@ function openDetail(index) {
         return link;
       }),
     );
+  }
+
+  const solvedButton = document.getElementById('detail-solved');
+  if (solvedButton) {
+    const solved = state.solved.has(problem.slug);
+    solvedButton.setAttribute('aria-pressed', String(solved));
+    solvedButton.textContent = solved ? 'Solved ✓' : 'Mark as solved';
+    solvedButton.dataset.solve = problem.slug;
+  }
+
+  const related = document.getElementById('detail-related');
+  if (related) {
+    related.replaceChildren(
+      ...relatedProblems(state.problems, problem.slug, 3).map((entry) => {
+        const item = document.createElement('li');
+        const link = document.createElement('button');
+        link.type = 'button';
+        link.className = 'link-button';
+        link.dataset.related = entry.problem.slug;
+        link.textContent = entry.problem.title;
+        const note = document.createElement('span');
+        note.textContent = ` ${relationLabel(entry)}`;
+        item.append(link, note);
+        return item;
+      }),
+    );
+    const section = document.getElementById('detail-related-section');
+    if (section) section.hidden = related.childElementCount === 0;
   }
 
   state.selected = problem.index;
@@ -697,10 +778,26 @@ function initShare() {
 }
 
 /* ------------------------------------------------------------------ init -- */
+/**
+ * Offline support. The service worker is optional by design: an insecure origin,
+ * an old browser, or a private-mode profile simply keeps the online behaviour.
+ */
+function registerServiceWorker() {
+  if (!('serviceWorker' in navigator)) return;
+  if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') return;
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch((error) => {
+      console.warn('offline support is unavailable:', error);
+    });
+  });
+}
+
 async function bootstrap() {
   try {
     const data = loadData();
     state.problems = data.problems;
+    state.categories = data.categories;
+    state.solved = loadSolved();
 
     hydrateLinks(data);
     renderHeroStats(data);
@@ -708,6 +805,7 @@ async function bootstrap() {
     renderFilters(data.categories);
     renderCards();
     renderNumbers(data);
+    renderProgress();
     initTheme();
 
     const search = document.getElementById('search');
@@ -730,10 +828,65 @@ async function bootstrap() {
       const details = event.target.closest('button[data-detail]');
       if (details) openDetail(Number(details.dataset.detail));
       else if (event.target.closest('[data-clear]')) clearFilters();
+      const solve = event.target.closest('button[data-solve]');
+      if (solve) {
+        const slug = solve.dataset.solve;
+        setSolved(slug, !state.solved.has(slug));
+      }
     });
+
+    // The detail sheet marks the same slug, and can jump to a related problem.
+    document.getElementById('detail-solved')?.addEventListener('click', (event) => {
+      const slug = event.currentTarget.dataset.solve;
+      if (!slug) return;
+      const solved = !state.solved.has(slug);
+      setSolved(slug, solved);
+      event.currentTarget.setAttribute('aria-pressed', String(solved));
+      event.currentTarget.textContent = solved ? 'Solved ✓' : 'Mark as solved';
+    });
+    document.getElementById('detail-related')?.addEventListener('click', (event) => {
+      const link = event.target instanceof Element ? event.target.closest('[data-related]') : null;
+      if (!link) return;
+      const problem = state.problems.find((entry) => entry.slug === link.dataset.related);
+      if (problem) openDetail(problem.index);
+    });
+
+    document.getElementById('unsolved-toggle')?.addEventListener('click', () => {
+      state.unsolvedOnly = !state.unsolvedOnly;
+      renderCards();
+      renderProgress();
+    });
+
+    state.palette = initPalette({
+      problems: state.problems,
+      categories: data.categories,
+      actions: {
+        openProblem: (index) => {
+          openDetail(index);
+          const slug = state.problems.find((problem) => problem.index === index)?.slug;
+          const card = slug ? document.getElementById(`problem-${slug}`) : null;
+          card?.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+        },
+        filterCategory: (category) => setCategory(category),
+        toggleTheme: () => applyTheme(state.theme === 'dark' ? 'light' : 'dark'),
+        toggleUnsolved: () => {
+          state.unsolvedOnly = !state.unsolvedOnly;
+          renderCards();
+          renderProgress();
+        },
+        clearFilters: () => clearFilters(),
+        copyLink: () => copyText(window.location.href),
+        openRepo: () => {
+          const repo = document.getElementById('hero-repo');
+          if (repo?.href) window.open(repo.href, '_blank', 'noopener');
+        },
+      },
+    });
+    document.getElementById('palette-trigger')?.addEventListener('click', () => state.palette?.open());
 
     // Not awaited: each canvas boots itself once it approaches the viewport.
     startScenes();
+    registerServiceWorker();
 
     // Keyboard users walk the visible cards without touching the mouse.
     window.addEventListener('keydown', (event) => {
@@ -746,6 +899,12 @@ async function bootstrap() {
         state.galaxy?.focus(null);
         hideTooltip();
         closeDetail();
+        return;
+      }
+      const paletteShortcut = (event.key === 'k' || event.key === 'K') && (event.metaKey || event.ctrlKey);
+      if (paletteShortcut || event.key === '/') {
+        event.preventDefault();
+        state.palette?.open();
         return;
       }
       if (event.key === 'ArrowDown' || event.key === 'j') {

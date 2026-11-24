@@ -1,0 +1,33 @@
+{
+  "name": "Sayanox Problem Solve Daily",
+  "short_name": "Problem Daily",
+  "description": "A 3D catalogue of hard engineering problems \u2014 each with a written brief, runnable Python, a test suite and a CLI.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#05070f",
+  "theme_color": "#0b1020",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": [
+    "developer",
+    "education",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

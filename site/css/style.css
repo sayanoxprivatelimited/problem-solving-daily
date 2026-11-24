@@ -1231,3 +1231,295 @@ html[data-theme="light"] .tooltip {
     width: 100%;
   }
 }
+
+/* ==========================================================================
+   Command palette, progress, related problems, offline install — round 20
+   ========================================================================== */
+
+.nav__command {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.42rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.08);
+  color: var(--muted);
+  font: 600 0.78rem/1 var(--mono);
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+
+.nav__command:hover,
+.nav__command:focus-visible {
+  color: var(--ink);
+  border-color: rgba(139, 92, 246, 0.6);
+  background: rgba(139, 92, 246, 0.16);
+}
+
+.nav__command-label {
+  font-family: var(--sans);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+@media (max-width: 640px) {
+  .nav__command-label {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------- palette -- */
+
+.palette {
+  width: min(680px, calc(100vw - 2rem));
+  margin: 12vh auto auto;
+  padding: 0;
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  border-radius: 20px;
+  background: var(--panel-solid);
+  color: var(--ink);
+  box-shadow: 0 40px 120px rgba(2, 6, 18, 0.8);
+  overflow: hidden;
+}
+
+.palette::backdrop {
+  background: rgba(3, 6, 14, 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.palette__inner {
+  display: flex;
+  flex-direction: column;
+  max-height: min(70vh, 620px);
+}
+
+.palette__field {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.95rem 1.1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.palette__icon {
+  color: var(--faint);
+  font-size: 1.1rem;
+}
+
+.palette__input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: 500 1rem/1.4 var(--sans);
+  outline: none;
+}
+
+.palette__input::placeholder {
+  color: var(--faint);
+}
+
+.palette__kbd,
+.palette__foot kbd {
+  padding: 0.15rem 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(148, 163, 184, 0.08);
+  color: var(--faint);
+  font: 600 0.7rem/1 var(--mono);
+}
+
+.palette__list {
+  margin: 0;
+  padding: 0.4rem;
+  list-style: none;
+  overflow-y: auto;
+}
+
+.palette__item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.palette__item[aria-selected="true"] {
+  background: rgba(139, 92, 246, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(139, 92, 246, 0.45);
+}
+
+.palette__label {
+  color: var(--ink);
+  font-weight: 550;
+}
+
+.palette__item[data-kind="action"] .palette__label::before,
+.palette__item[data-kind="category"] .palette__label::before {
+  content: "→ ";
+  color: var(--accent-2);
+}
+
+.palette__hint {
+  flex: none;
+  color: var(--faint);
+  font: 500 0.75rem/1.4 var(--mono);
+  text-align: right;
+}
+
+.palette__empty,
+.palette__foot {
+  margin: 0;
+  padding: 0.7rem 1.1rem;
+  color: var(--faint);
+  font-size: 0.82rem;
+}
+
+.palette__foot {
+  border-top: 1px solid var(--line);
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+/* --------------------------------------------------------------- progress -- */
+
+.progress {
+  margin-top: 1.6rem;
+  max-width: 30rem;
+}
+
+.progress__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  font: 600 0.78rem/1.4 var(--mono);
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.progress__track {
+  position: relative;
+  height: 6px;
+  margin: 0.5rem 0 0.45rem;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.16);
+  overflow: hidden;
+}
+
+.progress__bar {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  transition: width 260ms ease;
+}
+
+.progress__note {
+  margin: 0;
+  color: var(--faint);
+  font-size: 0.76rem;
+}
+
+.chip--progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.42rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.08);
+  color: var(--muted);
+  font: 600 0.78rem/1 var(--sans);
+  cursor: pointer;
+}
+
+.chip--progress[aria-pressed="true"] {
+  border-color: rgba(34, 211, 238, 0.55);
+  background: rgba(34, 211, 238, 0.16);
+  color: var(--ink);
+}
+
+.chip__count {
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.18);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+}
+
+/* ------------------------------------------------------------------ cards -- */
+
+.card__solved {
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--faint);
+  font: 600 0.7rem/1.5 var(--sans);
+  cursor: pointer;
+}
+
+.card__solved[aria-pressed="true"] {
+  border-color: rgba(52, 211, 153, 0.6);
+  background: rgba(52, 211, 153, 0.14);
+  color: #6ee7b7;
+}
+
+.card.is-solved {
+  border-color: rgba(52, 211, 153, 0.35);
+}
+
+.card.is-solved .card__index {
+  color: #6ee7b7;
+}
+
+/* ------------------------------------------------------------- detail sheet -- */
+
+.sheet__solved {
+  margin-top: 1.1rem;
+}
+
+.sheet__solved[aria-pressed="true"] {
+  border-color: rgba(52, 211, 153, 0.6);
+  color: #6ee7b7;
+}
+
+.sheet__related {
+  margin-top: 1.4rem;
+}
+
+.sheet__related-list {
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.sheet__related-list li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: baseline;
+  font-size: 0.88rem;
+  color: var(--faint);
+}
+
+.sheet__related-list .link-button {
+  color: var(--accent-2);
+  font-weight: 550;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress__bar {
+    transition: none;
+  }
+}
