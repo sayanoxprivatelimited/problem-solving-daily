@@ -17,3 +17,6 @@ env/
 # Build artifacts
 .site-dist/
 .site-dist-remote/
+
+# Local test harnesses (jsdom smoke runs); never shipped.
+node_modules/

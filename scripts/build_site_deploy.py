@@ -60,9 +60,12 @@ PAYLOAD = (
     "data/catalog.js",
     "robots.txt",
     "sitemap.xml",
+    "offline.html",
+    "sw.js",
     "assets/icon.svg",
     "assets/apple-touch-icon.png",
     "assets/og-cover.jpg",
+    "assets/manifest.webmanifest",
 )
 
 #: Same version as the vendored build, so local and deployed behaviour match.

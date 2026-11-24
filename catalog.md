@@ -2,7 +2,7 @@
 
 # 📚 Problem catalog
 
-**19** problems · **19** solved and tested · **6** categories · every solved problem has a runnable CLI and a test suite.
+**20** problems · **20** solved and tested · **6** categories · every solved problem has a runnable CLI and a test suite.
 
 | # | Problem | Category | Level | Concepts | Solution | Status |
 |---|---------|----------|-------|----------|----------|--------|
@@ -17,14 +17,15 @@
 | 9 | [Layered configuration resolution](problems/cli/02-layered-configuration-resolution/problem.md) | `cli` | 🔴 hard | config precedence, dotenv parsing, type coercion, provenance, masking | [code](problems/cli/02-layered-configuration-resolution/solution/main.py) | ✅ solved |
 | 10 | [Build order from package manifests](problems/coding/01-build-order/problem.md) | `coding` | 🟡 medium | dependency graphs, topological sort, cycle reporting, incremental builds | [code](problems/coding/01-build-order/solution/main.py) | ✅ solved |
 | 11 | [Unified diff and patch engine](problems/coding/02-unified-diff-and-patch-engine/problem.md) | `coding` | 🔴 hard | diff, Myers algorithm, hunks, patch application, fuzz testing | [code](problems/coding/02-unified-diff-and-patch-engine/solution/main.py) | ✅ solved |
-| 12 | [Nginx access log report](problems/data/01-nginx-log-report/problem.md) | `data` | 🟡 medium | regex parsing, dataclasses, streaming aggregation, percentiles | [code](problems/data/01-nginx-log-report/solution/main.py) | ✅ solved |
-| 13 | [Clean a messy sales export](problems/data/02-messy-csv-sales-report/problem.md) | `data` | 🟡 medium | CSV parsing, Decimal money math, multi-format dates, dedupe, data quality | [code](problems/data/02-messy-csv-sales-report/solution/main.py) | ✅ solved |
-| 14 | [Sessionize an out-of-order event stream](problems/data/03-sessionize-an-out-of-order-event-stream/problem.md) | `data` | 🔴 hard | event time, watermarks, session windows, late data | [code](problems/data/03-sessionize-an-out-of-order-event-stream/solution/main.py) | ✅ solved |
-| 15 | [Streaming dedupe of a huge JSONL file](problems/data/04-streaming-dedupe-of-a-huge-jsonl-file/problem.md) | `data` | 🟡 medium | streaming, external memory, hashing, sharding, bounded memory | [code](problems/data/04-streaming-dedupe-of-a-huge-jsonl-file/solution/main.py) | ✅ solved |
-| 16 | [Incremental HTTP/1.1 request parser](problems/network/01-incremental-http-parser/problem.md) | `network` | 🔴 hard | byte-stream parsing, state machines, chunked encoding, request smuggling, limits | [code](problems/network/01-incremental-http-parser/solution/main.py) | ✅ solved |
-| 17 | [CIDR planner for a VPC](problems/network/02-cidr-planner/problem.md) | `network` | 🟡 medium | IPv4 math, subnets, overlap detection, address aggregation | [code](problems/network/02-cidr-planner/solution/main.py) | ✅ solved |
-| 18 | [Retrying client with a circuit breaker](problems/network/03-retrying-client-with-a-circuit-breaker/problem.md) | `network` | 🔴 hard | retries, jitter, circuit breaker, idempotency | [code](problems/network/03-retrying-client-with-a-circuit-breaker/solution/main.py) | ✅ solved |
-| 19 | [WebSocket frame decoder](problems/network/04-websocket-frame-decoder/problem.md) | `network` | 🔴 hard | RFC 6455, framing, incremental parsing, masking, fragmentation, UTF-8 | [code](problems/network/04-websocket-frame-decoder/solution/main.py) | ✅ solved |
+| 12 | [A regex engine with bounded backtracking](problems/coding/03-a-regex-engine-with-bounded-backtracking/problem.md) | `coding` | 🔴 hard | parser, Thompson NFA, backtracking, capture groups, ReDoS budgets | [code](problems/coding/03-a-regex-engine-with-bounded-backtracking/solution/main.py) | ✅ solved |
+| 13 | [Nginx access log report](problems/data/01-nginx-log-report/problem.md) | `data` | 🟡 medium | regex parsing, dataclasses, streaming aggregation, percentiles | [code](problems/data/01-nginx-log-report/solution/main.py) | ✅ solved |
+| 14 | [Clean a messy sales export](problems/data/02-messy-csv-sales-report/problem.md) | `data` | 🟡 medium | CSV parsing, Decimal money math, multi-format dates, dedupe, data quality | [code](problems/data/02-messy-csv-sales-report/solution/main.py) | ✅ solved |
+| 15 | [Sessionize an out-of-order event stream](problems/data/03-sessionize-an-out-of-order-event-stream/problem.md) | `data` | 🔴 hard | event time, watermarks, session windows, late data | [code](problems/data/03-sessionize-an-out-of-order-event-stream/solution/main.py) | ✅ solved |
+| 16 | [Streaming dedupe of a huge JSONL file](problems/data/04-streaming-dedupe-of-a-huge-jsonl-file/problem.md) | `data` | 🟡 medium | streaming, external memory, hashing, sharding, bounded memory | [code](problems/data/04-streaming-dedupe-of-a-huge-jsonl-file/solution/main.py) | ✅ solved |
+| 17 | [Incremental HTTP/1.1 request parser](problems/network/01-incremental-http-parser/problem.md) | `network` | 🔴 hard | byte-stream parsing, state machines, chunked encoding, request smuggling, limits | [code](problems/network/01-incremental-http-parser/solution/main.py) | ✅ solved |
+| 18 | [CIDR planner for a VPC](problems/network/02-cidr-planner/problem.md) | `network` | 🟡 medium | IPv4 math, subnets, overlap detection, address aggregation | [code](problems/network/02-cidr-planner/solution/main.py) | ✅ solved |
+| 19 | [Retrying client with a circuit breaker](problems/network/03-retrying-client-with-a-circuit-breaker/problem.md) | `network` | 🔴 hard | retries, jitter, circuit breaker, idempotency | [code](problems/network/03-retrying-client-with-a-circuit-breaker/solution/main.py) | ✅ solved |
+| 20 | [WebSocket frame decoder](problems/network/04-websocket-frame-decoder/problem.md) | `network` | 🔴 hard | RFC 6455, framing, incremental parsing, masking, fragmentation, UTF-8 | [code](problems/network/04-websocket-frame-decoder/solution/main.py) | ✅ solved |
 
 ## Breakdown
 
@@ -33,14 +34,14 @@
 | `ai` | 3 | 3 |
 | `backend` | 4 | 4 |
 | `cli` | 2 | 2 |
-| `coding` | 2 | 2 |
+| `coding` | 3 | 3 |
 | `data` | 4 | 4 |
 | `network` | 4 | 4 |
 
 | Level | Problems |
 |-------|----------|
 | 🟡 medium | 8 |
-| 🔴 hard | 11 |
+| 🔴 hard | 12 |
 
 ## Repository checks
 

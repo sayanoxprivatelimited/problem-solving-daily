@@ -207,3 +207,162 @@ export function labelOffset(problem) {
   const level = String(problem.level || 'medium').toLowerCase();
   return level === 'hard' ? 0.72 : 0.62;
 }
+
+/* ------------------------------------------------------------- new, 20-round -- */
+
+/**
+ * A subsequence score for quick-switch search.
+ *
+ * Every character of the query must appear in `text`, in order. The score
+ * rewards matches that are contiguous, matches at the start of a word, and an
+ * exact substring — and it is deterministic, so the palette never reorders
+ * itself between two identical keystrokes.
+ *
+ * @returns {number} -1 when the query does not match at all
+ */
+export function fuzzyScore(text, query) {
+  const haystack = String(text ?? '').toLowerCase();
+  const needle = String(query ?? '').toLowerCase().trim();
+  if (!needle) return 0;
+  if (!haystack) return -1;
+
+  let score = 0;
+  let from = 0;
+  let previous = -2;
+  for (const char of needle) {
+    const found = haystack.indexOf(char, from);
+    if (found === -1) return -1;
+    score += 1;
+    if (found === previous + 1) score += 2;
+    if (found === 0 || /[\s·\-_/]/.test(haystack[found - 1])) score += 3;
+    previous = found;
+    from = found + 1;
+  }
+  if (haystack === needle) score += 12;
+  else if (haystack.includes(needle)) score += 6;
+  // Shorter labels win ties: "Data" beats "Data engineering".
+  return score - Math.floor(haystack.length / 40);
+}
+
+/**
+ * Rank problems for the command palette.
+ *
+ * A query with several words must match all of them (in any field), which is how
+ * "hard csv" finds the messy-export problem without knowing its title.
+ */
+export function rankProblems(problems, query, limit = Infinity) {
+  const needle = String(query ?? '').trim();
+  if (!needle) return problems.slice(0, limit).map((problem) => ({ problem, score: 0 }));
+
+  const tokens = needle.toLowerCase().split(/\s+/).filter(Boolean);
+  const ranked = [];
+  for (const problem of problems) {
+    const fields = [
+      problem.title,
+      prettyCategory(problem.category),
+      problem.level,
+      problem.slug,
+      ...(problem.concepts ?? []),
+    ];
+    // The title is worth double: a hit there is what the visitor typed.
+    let best = fuzzyScore(problem.title, needle);
+    if (best >= 0) best *= 2;
+    for (const field of fields.slice(1)) best = Math.max(best, fuzzyScore(field, needle));
+
+    if (tokens.length > 1) {
+      // Every word must appear *somewhere*, as a substring of a field. A fuzzy
+      // subsequence across a joined blob would match far too much ("android"
+      // scatters through "pagination over a mutable list").
+      const lowered = fields.map((field) => String(field ?? '').toLowerCase());
+      const all = tokens.every((token) => lowered.some((field) => field.includes(token)));
+      if (!all) continue;
+      best = Math.max(best, 0) + tokens.length * 4;
+    }
+    if (best >= 0) ranked.push({ problem, score: best });
+  }
+
+  ranked.sort((a, b) => b.score - a.score || a.problem.index - b.problem.index);
+  return ranked.slice(0, limit);
+}
+
+/**
+ * Rank palette commands (problems, category filters, actions) by label first,
+ * then keywords. Ties keep the caller's order, so the palette is stable.
+ */
+export function rankCommands(commands, query, limit = Infinity) {
+  const needle = String(query ?? '').trim();
+  if (!needle) return commands.slice(0, limit);
+
+  const ranked = [];
+  commands.forEach((command, order) => {
+    // A label match is what the visitor meant; a keyword match is a good guess.
+    const label = fuzzyScore(command.label, needle);
+    const keywords = Math.max(...(command.keywords ?? []).map((word) => fuzzyScore(word, needle)), -1);
+    const score = Math.max(label >= 0 ? label * 2 : -1, keywords);
+    if (score >= 0) ranked.push({ command, score, order });
+  });
+  ranked.sort((a, b) => b.score - a.score || a.order - b.order);
+  return ranked.slice(0, limit).map((entry) => entry.command);
+}
+
+/**
+ * The "what next?" graph for one problem.
+ *
+ * A shared concept is the strongest signal, so it is weighted twice as heavily
+ * as being in the same category — but a category sibling is still worth showing,
+ * because concepts are deliberately specific ("fencing tokens") and most
+ * problems share none. Without that fallback the drawer would be empty almost
+ * everywhere, which is worse than a slightly weaker recommendation.
+ */
+export function relatedProblems(problems, slug, limit = 3) {
+  const subject = problems.find((problem) => problem.slug === slug);
+  if (!subject) return [];
+  const mine = new Set((subject.concepts ?? []).map((concept) => concept.toLowerCase()));
+
+  return problems
+    .filter((problem) => problem.slug !== slug)
+    .map((problem) => {
+      const shared = (problem.concepts ?? []).filter((concept) => mine.has(concept.toLowerCase()));
+      const sameCategory = problem.category === subject.category;
+      return {
+        problem,
+        shared,
+        sameCategory,
+        score: shared.length * 2 + (sameCategory ? 1 : 0),
+      };
+    })
+    .filter((entry) => entry.score > 0)
+    .sort(
+      (a, b) =>
+        b.score - a.score
+        || Math.abs(a.problem.index - subject.index) - Math.abs(b.problem.index - subject.index)
+        || a.problem.index - b.problem.index,
+    )
+    .slice(0, limit);
+}
+
+/** How to describe one entry from `relatedProblems`. */
+export function relationLabel({ shared, sameCategory }) {
+  if (shared?.length) return `shares ${shared.join(', ')}`;
+  return sameCategory ? 'same category' : '';
+}
+
+/** Toggle one slug in a set of solved slugs, returning a new set. */
+export function toggleSolved(solved, slug) {
+  const next = new Set(solved);
+  if (next.has(slug)) next.delete(slug);
+  else next.add(slug);
+  return next;
+}
+
+/** How much of the catalogue has been marked solved. */
+export function progressSummary(problems, solved) {
+  const total = problems.length;
+  const done = problems.reduce((count, problem) => count + (solved.has(problem.slug) ? 1 : 0), 0);
+  return {
+    total,
+    solved: done,
+    remaining: total - done,
+    percent: total ? Math.round((done / total) * 100) : 0,
+  };
+}

@@ -179,6 +179,27 @@ Because the scenes are imported lazily, a failed `three` request costs the four
 canvases and nothing else: the cards, filters, stats and footer are already in the
 DOM, and the page switches to its `no-webgl` styles.
 
+## Features beyond the catalogue
+
+| Feature | How it works | Where |
+| --- | --- | --- |
+| Command palette | `⌘K` / `Ctrl-K` (or the nav button, or `/`) opens a dialog that ranks problems, category filters and actions with `fuzzyScore` + `rankCommands` | `js/palette.js`, `js/layout.js` |
+| Local progress | Marking a problem solved writes a sorted array of slugs to `localStorage` under `psd-solved`; the hero meter, the card badges and the "unsolved only" chip all read from it | `js/progress.js` |
+| Related problems | The detail sheet lists up to three neighbours: a shared concept scores 2, the same category scores 1, so the graph is never empty | `relatedProblems()` in `js/layout.js` |
+| Offline support | A service worker precaches the shell, serves navigation network-first (a deploy is visible on the next load) and everything else stale-while-revalidate; `offline.html` is the fallback | `sw.js`, `assets/manifest.webmanifest` |
+| Installable | A web app manifest with a standalone display mode, theme colour and two icons | `assets/manifest.webmanifest` |
+
+All of it is enhancement-only: with JavaScript disabled, a blocked service worker
+or a full `localStorage`, the page is still the catalogue it was before.
+
+## Tests
+
+```bash
+node --test site/tests/*.test.mjs    # 77 pure-function tests, no dependencies
+npm install jsdom --no-save          # optional, for the DOM smoke test
+node tools/smoke-dom.mjs             # 17 checks: palette, progress, filters, sheet
+```
+
 ## Deployment
 
 Live at **https://problem-solving-daily.vercel.app** (Vercel project
