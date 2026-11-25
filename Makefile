@@ -1,7 +1,9 @@
-.PHONY: help test catalog seo site site-test site-bundle site-shell serve new clean
+.PHONY: help test check check-docs catalog seo site site-test site-bundle site-shell serve new clean
 
 help:
 	@echo "make test      - run every problem's tests + doctests, then the site tests"
+	@echo "make check     - everything that must be true before a push (tests, counts, SEO)"
+	@echo "make check-docs- verify README's counts against the catalogue"
 	@echo "make catalog   - regenerate catalog.md and site/data/problems.json"
 	@echo "make seo       - regenerate robots.txt, sitemap.xml and the JSON-LD block"
 	@echo "make site-test - run the site's Node tests (layout, wiring, seo)"
@@ -16,6 +18,16 @@ test:
 	@command -v node >/dev/null 2>&1 \
 		&& node --test site/tests/*.test.mjs \
 		|| echo "node not found - skipping the site tests"
+
+# One command to run before pushing: the suite, the generated files, and every
+# number a human could have typed by hand.
+check: test
+	python3 scripts/build_catalog.py --check
+	python3 scripts/build_seo.py --check
+	python3 scripts/check_docs.py
+
+check-docs:
+	python3 scripts/check_docs.py
 
 catalog:
 	python3 scripts/build_catalog.py
