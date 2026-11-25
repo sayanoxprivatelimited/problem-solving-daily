@@ -11,7 +11,7 @@ whitespace, an HTTP parser that must survive hostile chunking, a rate limiter th
 must hold under eight threads. Every problem states its constraints and its
 assumptions — because that is the part that is hard in real work.
 
-**19 problems · 632 tests · 207 doctests · 6 categories · zero dependencies** (Python 3.10+)
+**20 problems · 700 tests · 228 doctests · 6 categories · zero dependencies** (Python 3.10+)
 
 Live site: **<https://problem-solving-daily.vercel.app>** — a **3D showcase** (four
 WebGL scenes, search, detail sheet, light/dark theme, shareable deep links) built from
@@ -97,29 +97,28 @@ fresh clone works offline.
 
 ```
 .
-├── problems/
-│   ├── ai/
-│   │   ├── 01-bpe-tokenizer/{problem.md, solution/, tests/}
-│   │   └── 02-retrieval-with-citations/
-│   ├── backend/01-token-bucket-rate-limiter/
-│   ├── cli/01-file-organizer/
-│   ├── coding/01-build-order/
-│   ├── data/{01-nginx-log-report, 02-messy-csv-sales-report}/
-│   └── network/{01-incremental-http-parser, 02-cidr-planner}/
+├── problems/                # 20 problems: brief, solution, tests
+│   └── <category>/<NN-slug>/{problem.md, solution/, tests/}
 ├── scripts/
 │   ├── run_tests.py         # per-problem import isolation + doctests
-│   ├── build_catalog.py     # problem.md front matter → catalog.md
+│   ├── build_catalog.py     # problem.md front matter → catalog.md + site data
+│   ├── build_seo.py         # robots.txt, sitemap.xml, JSON-LD, every count on the page
+│   ├── build_site_deploy.py # the same-origin bundle and the one-file CDN shell
+│   ├── check_docs.py        # README's totals vs the catalogue (--fix to repair)
 │   └── new_problem.py       # scaffold a new problem (red-first)
 ├── templates/               # problem.md / module / test skeletons
 ├── site/                    # 3D catalogue (see site/README.md)
 │   ├── index.html
-│   ├── js/{main,layout,engine}.js + js/scenes/{hero,galaxy,bars,structure}.js
+│   ├── js/{main,layout,engine,palette,progress}.js + js/scenes/…
 │   ├── data/catalog.js      # generated module the page imports
 │   ├── data/problems.json   # the same payload, for tooling
+│   ├── sw.js, offline.html  # offline shell (service worker + fallback)
 │   ├── assets/three.module.js  # vendored Three.js r169 (MIT)
-│   └── tests/               # node --test: layout maths + wiring checks
+│   ├── assets/manifest.webmanifest
+│   └── tests/               # node --test: layout maths, new features, PWA wiring
+├── tools/smoke-dom.mjs      # optional jsdom run through the real page
 ├── catalog.md               # generated
-└── Makefile                 # make test | catalog | site-test | serve | new | clean
+└── Makefile                 # make check | test | catalog | seo | site | serve | new
 ```
 
 Each problem folder is the same shape:
@@ -134,6 +133,20 @@ Each problem folder is the same shape:
     ├── test_main.py
     └── fixtures/
 ```
+
+## Before you push
+
+```bash
+make check        # the suite, then every generated file and every hand-typed number
+```
+
+`make check` is `run_tests.py` + the site tests + `build_catalog.py --check` +
+`build_seo.py --check` + `check_docs.py`. The last one exists because the README's
+totals were the only count in the repository that a human typed by hand, and they
+drifted three times: a stale "Twelve" in the hero, "19 problems" on a page with 20,
+and "632 tests" long after the suite had 700. Now the number is checked, and
+`python3 scripts/check_docs.py --fix` repairs it from the catalogue.
+
 
 ## Add a problem
 
