@@ -62,6 +62,7 @@ site/
 ├── js/
 │   ├── main.js            # fetch data → render DOM → boot scenes
 │   ├── layout.js          # pure maths: palette, galaxy spiral, bar heights, stars
+│   ├── urlstate.js        # what ?q=, ?p=, ?cat=, ?unsolved= mean, and how they are written
 │   ├── engine.js          # Stage: renderer, resize, visibility, reduced motion
 │   └── scenes/
 │       ├── hero.js        # instanced token stream
@@ -82,6 +83,8 @@ node --test site/tests/*.test.mjs     # or: make site-test
 
 40 checks, no GPU required:
 
+- **`urlstate.test.mjs`** — reading and writing the four shareable parameters: defaults
+  never written, canonical order, junk categories rejected, awkward characters round-trip.
 - **`layout.test.mjs`** — palette, category grouping, summary totals, galaxy radii and
   sector membership, bar heights/centring/spacing, deterministic star field, keyboard
   index wrapping, filters.
@@ -188,6 +191,7 @@ DOM, and the page switches to its `no-webgl` styles.
 | Related problems | The detail sheet lists up to three neighbours: a shared concept scores 2, the same category scores 1, so the graph is never empty | `relatedProblems()` in `js/layout.js` |
 | Offline support | A service worker precaches the shell, serves navigation network-first (a deploy is visible on the next load) and everything else stale-while-revalidate; `offline.html` is the fallback | `sw.js`, `assets/manifest.webmanifest` |
 | Installable | A web app manifest with a standalone display mode, theme colour and two icons | `assets/manifest.webmanifest` |
+| Shareable filters | The search term, the open problem, the category and the "unsolved only" chip all live in the URL (`?q=`, `?p=`, `?cat=`, `?unsolved=1`) in a canonical order, and back/forward restores the view | `js/urlstate.js` |
 
 All of it is enhancement-only: with JavaScript disabled, a blocked service worker
 or a full `localStorage`, the page is still the catalogue it was before.

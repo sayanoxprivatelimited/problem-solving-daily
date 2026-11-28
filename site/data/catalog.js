@@ -7,16 +7,16 @@ export default {
     "branch": "main"
   },
   "stats": {
-    "problems": 20,
-    "solved": 20,
+    "problems": 21,
+    "solved": 21,
     "categories": 6,
-    "tests": 700,
-    "doctests": 228,
-    "solution_lines": 8125,
+    "tests": 788,
+    "doctests": 242,
+    "solution_lines": 8670,
     "levels": {
       "easy": 0,
       "medium": 8,
-      "hard": 12
+      "hard": 13
     }
   },
   "categories": [
@@ -42,8 +42,8 @@ export default {
     },
     {
       "name": "data",
-      "problems": 4,
-      "solved": 4
+      "problems": 5,
+      "solved": 5
     },
     {
       "name": "network",
@@ -498,6 +498,35 @@ export default {
     },
     {
       "index": 17,
+      "slug": "05-a-watermark-driven-windowed-aggregator-with-retractions",
+      "category": "data",
+      "title": "A watermark-driven windowed aggregator with retractions",
+      "level": "hard",
+      "status": "solved",
+      "concepts": [
+        "event time",
+        "watermarks",
+        "sliding windows",
+        "late data",
+        "retractions",
+        "exactly-once"
+      ],
+      "summary": "The dashboard said 1,204 checkouts in the 12:00 minute. It was wrong, and nobody found out for three weeks.",
+      "criteria": [
+        "Windows are half-open [start, start + size) on event time, aligned to multiples of hop.",
+        "hop == size is tumbling; hop < size is sliding, and one event joins every window containing it.",
+        "hop > size is an error.",
+        "watermark = max(ts seen) - lateness, started at None, never decreasing."
+      ],
+      "tests": 88,
+      "doctests": 14,
+      "solution_lines": 545,
+      "path": "problems/data/05-a-watermark-driven-windowed-aggregator-with-retractions",
+      "brief_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/05-a-watermark-driven-windowed-aggregator-with-retractions/problem.md",
+      "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/data/05-a-watermark-driven-windowed-aggregator-with-retractions/solution/main.py"
+    },
+    {
+      "index": 18,
       "slug": "01-incremental-http-parser",
       "category": "network",
       "title": "Incremental HTTP/1.1 request parser",
@@ -525,7 +554,7 @@ export default {
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/01-incremental-http-parser/solution/main.py"
     },
     {
-      "index": 18,
+      "index": 19,
       "slug": "02-cidr-planner",
       "category": "network",
       "title": "CIDR planner for a VPC",
@@ -552,7 +581,7 @@ export default {
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/02-cidr-planner/solution/main.py"
     },
     {
-      "index": 19,
+      "index": 20,
       "slug": "03-retrying-client-with-a-circuit-breaker",
       "category": "network",
       "title": "Retrying client with a circuit breaker",
@@ -579,7 +608,7 @@ export default {
       "code_url": "https://github.com/sayanoxprivatelimited/problem-solving-daily/blob/main/problems/network/03-retrying-client-with-a-circuit-breaker/solution/main.py"
     },
     {
-      "index": 20,
+      "index": 21,
       "slug": "04-websocket-frame-decoder",
       "category": "network",
       "title": "WebSocket frame decoder",

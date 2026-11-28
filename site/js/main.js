@@ -22,6 +22,7 @@ import {
 } from './layout.js';
 import { initPalette } from './palette.js';
 import { loadSolved, saveSolved } from './progress.js';
+import { isDefaultState, readUrlState, stateKey, writeUrlState } from './urlstate.js';
 
 /**
  * Every scene is imported lazily, on purpose.
@@ -161,6 +162,7 @@ function renderFilters(categories) {
     const button = event.target.closest('button[data-category]');
     if (!button) return;
     setCategory(button.dataset.category);
+    syncUrl();
   });
 }
 
@@ -623,20 +625,21 @@ function moveSelection(direction) {
 /**
  * The page state lives in the URL, so a share link opens the same view.
  *
- *   ?q=tokenizer      the search box, pre-filled
+ *   ?q=tokenizer          the search box, pre-filled
  *   ?p=01-bpe-tokenizer   the detail sheet, open on that problem
- *   #problem-<slug>   the card itself (an anchor, no script needed)
+ *   ?cat=network          the category filter
+ *   ?unsolved=1           only the problems you have not marked solved
+ *   #problem-<slug>       the card itself (an anchor, no script needed)
+ *
+ * The four parameters are read and written by `urlstate.js`, in one canonical
+ * order, and omitted when they are at their default — a plain visit stays a
+ * plain URL, which is the URL the canonical link and the sitemap advertise.
  *
  * `replaceState`, not `pushState`: typing in the search box must not fill the
  * back button with one entry per keystroke.
  */
-function urlFor({ query = '', slug = '' }) {
-  const url = new URL(window.location.href);
-  url.hash = '';
-  url.search = '';
-  if (query) url.searchParams.set('q', query);
-  if (slug) url.searchParams.set('p', slug);
-  return url.toString();
+function urlFor({ query = '', slug = '', category = 'all', unsolvedOnly = false } = {}) {
+  return writeUrlState(window.location.href, { query, slug, category, unsolvedOnly });
 }
 
 function replaceUrl(params) {
@@ -653,19 +656,38 @@ function slugOf(index) {
   return state.problems.find((problem) => problem.index === index)?.slug ?? '';
 }
 
-/** Write the current search + selection back into the address bar. */
+/**
+ * Write the whole view back into the address bar.
+ *
+ * Called after every action a user could want to share: a search, a filter, a
+ * solved-toggle, opening a sheet. Never called while *applying* a URL, or the two
+ * would chase each other.
+ */
 function syncUrl() {
-  replaceUrl({ query: state.query, slug: slugOf(state.selected) });
+  replaceUrl({
+    query: state.query,
+    slug: slugOf(state.selected),
+    category: state.category,
+    unsolvedOnly: state.unsolvedOnly,
+  });
+}
+
+/** Re-render everything a URL can change, without writing the URL back. */
+function applyUrlState({ query = '', category = 'all', unsolvedOnly = false } = {}) {
+  state.query = query;
+  const input = document.getElementById('search');
+  if (input) input.value = query;
+  setCategory(category);
+  state.unsolvedOnly = unsolvedOnly;
+  renderCards();
+  renderProgress();
 }
 
 function applyDeepLink() {
   const params = new URLSearchParams(window.location.search);
-  const query = (params.get('q') ?? '').trim();
-  if (query) {
-    state.query = query;
-    const input = document.getElementById('search');
-    if (input) input.value = query;
-    renderCards();
+  const shared = readUrlState(window.location.search);
+  if (shared.query || shared.category !== 'all' || shared.unsolvedOnly) {
+    applyUrlState(shared);
   }
 
   const hash = window.location.hash.startsWith('#problem-')
@@ -745,9 +767,20 @@ function initShare() {
   }
 
   document.getElementById('copy-link')?.addEventListener('click', async () => {
-    const copied = await copyText(window.location.href);
+    // Write the filter into the URL *before* copying, or the recipient gets the
+    // search term and loses the category they were looking at.
+    syncUrl();
+    const shareState = {
+      query: state.query,
+      slug: slugOf(state.selected),
+      category: state.category,
+      unsolvedOnly: state.unsolvedOnly,
+    };
+    // A pristine page shares the canonical URL, not whatever tracking parameter
+    // the visitor happened to arrive with.
+    const link = isDefaultState(shareState) ? CANONICAL_URL : window.location.href;
+    const copied = await copyText(link);
     announce(copied ? 'Link copied — paste it anywhere.' : 'Copy failed — select the address bar instead.');
-    replaceUrl({ query: state.query, slug: slugOf(state.selected) });
   });
 
   document.getElementById('hero-share')?.addEventListener('click', async () => {
@@ -818,6 +851,21 @@ async function bootstrap() {
     initShare();
     applyDeepLink();
 
+    // Back and forward move between the states we wrote with replaceState — which,
+    // because we only ever *replace*, are the handful of entries the user's own
+    // navigation created. Re-apply whatever the URL says, without writing it back.
+    window.addEventListener('popstate', () => {
+      const shared = readUrlState(window.location.search);
+      const current = {
+        query: state.query,
+        slug: slugOf(state.selected),
+        category: state.category,
+        unsolvedOnly: state.unsolvedOnly,
+      };
+      if (stateKey(shared) === stateKey(current)) return;
+      applyUrlState(shared);
+    });
+
     document.getElementById('detail-close')?.addEventListener('click', closeDetail);
     sheet?.addEventListener('click', (event) => {
       if (event.target === sheet) closeDetail(); // clicking the backdrop closes it
@@ -855,6 +903,7 @@ async function bootstrap() {
       state.unsolvedOnly = !state.unsolvedOnly;
       renderCards();
       renderProgress();
+      syncUrl();
     });
 
     state.palette = initPalette({
@@ -867,12 +916,16 @@ async function bootstrap() {
           const card = slug ? document.getElementById(`problem-${slug}`) : null;
           card?.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
         },
-        filterCategory: (category) => setCategory(category),
+        filterCategory: (category) => {
+          setCategory(category);
+          syncUrl();
+        },
         toggleTheme: () => applyTheme(state.theme === 'dark' ? 'light' : 'dark'),
         toggleUnsolved: () => {
           state.unsolvedOnly = !state.unsolvedOnly;
           renderCards();
           renderProgress();
+          syncUrl();
         },
         clearFilters: () => clearFilters(),
         copyLink: () => copyText(window.location.href),
