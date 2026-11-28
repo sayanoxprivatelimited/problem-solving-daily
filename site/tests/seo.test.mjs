@@ -248,8 +248,15 @@ test('deep links are readable and writable, and match the structured data', () =
   assert.match(main, /history\.replaceState/);
   assert.doesNotMatch(main, /history\.pushState/);
 
-  assert.match(main, /\.get\('q'\)/, 'the search box must read ?q=');
-  assert.match(main, /\.get\('p'\)/, 'the sheet must read ?p=');
+  // The four shareable parameters are parsed in one place, so a link written by
+  // one part of the page cannot be read differently by another.
+  const urlState = read('js/urlstate.js');
+  assert.match(urlState, /\.get\('q'\)/, 'the search box must read ?q=');
+  assert.match(urlState, /\.get\('p'\)/, 'the sheet must read ?p=');
+  assert.match(urlState, /\.get\('cat'\)/, 'the category filter must read ?cat=');
+  assert.match(urlState, /\.get\('unsolved'\)/, 'the unsolved toggle must read ?unsolved=');
+  assert.match(main, /from '\.\/urlstate\.js'/, 'main.js must use the shared parser');
+  assert.match(main, /addEventListener\('popstate'/, 'back and forward must restore the view');
   assert.match(main, /#problem-/);
   assert.match(main, /id="problem-\$\{problem\.slug\}"/, 'cards need a stable anchor id');
 

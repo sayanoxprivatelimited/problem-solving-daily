@@ -11,7 +11,7 @@ whitespace, an HTTP parser that must survive hostile chunking, a rate limiter th
 must hold under eight threads. Every problem states its constraints and its
 assumptions — because that is the part that is hard in real work.
 
-**20 problems · 700 tests · 228 doctests · 6 categories · zero dependencies** (Python 3.10+)
+**21 problems · 788 tests · 242 doctests · 6 categories · zero dependencies** (Python 3.10+)
 
 Live site: **<https://problem-solving-daily.vercel.app>** — a **3D showcase** (four
 WebGL scenes, search, detail sheet, light/dark theme, shareable deep links) built from
@@ -109,7 +109,7 @@ fresh clone works offline.
 ├── templates/               # problem.md / module / test skeletons
 ├── site/                    # 3D catalogue (see site/README.md)
 │   ├── index.html
-│   ├── js/{main,layout,engine,palette,progress}.js + js/scenes/…
+│   ├── js/{main,layout,engine,palette,progress,urlstate}.js + js/scenes/…
 │   ├── data/catalog.js      # generated module the page imports
 │   ├── data/problems.json   # the same payload, for tooling
 │   ├── sw.js, offline.html  # offline shell (service worker + fallback)

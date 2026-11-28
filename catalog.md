@@ -2,7 +2,7 @@
 
 # 📚 Problem catalog
 
-**20** problems · **20** solved and tested · **6** categories · every solved problem has a runnable CLI and a test suite.
+**21** problems · **21** solved and tested · **6** categories · every solved problem has a runnable CLI and a test suite.
 
 | # | Problem | Category | Level | Concepts | Solution | Status |
 |---|---------|----------|-------|----------|----------|--------|
@@ -22,10 +22,11 @@
 | 14 | [Clean a messy sales export](problems/data/02-messy-csv-sales-report/problem.md) | `data` | 🟡 medium | CSV parsing, Decimal money math, multi-format dates, dedupe, data quality | [code](problems/data/02-messy-csv-sales-report/solution/main.py) | ✅ solved |
 | 15 | [Sessionize an out-of-order event stream](problems/data/03-sessionize-an-out-of-order-event-stream/problem.md) | `data` | 🔴 hard | event time, watermarks, session windows, late data | [code](problems/data/03-sessionize-an-out-of-order-event-stream/solution/main.py) | ✅ solved |
 | 16 | [Streaming dedupe of a huge JSONL file](problems/data/04-streaming-dedupe-of-a-huge-jsonl-file/problem.md) | `data` | 🟡 medium | streaming, external memory, hashing, sharding, bounded memory | [code](problems/data/04-streaming-dedupe-of-a-huge-jsonl-file/solution/main.py) | ✅ solved |
-| 17 | [Incremental HTTP/1.1 request parser](problems/network/01-incremental-http-parser/problem.md) | `network` | 🔴 hard | byte-stream parsing, state machines, chunked encoding, request smuggling, limits | [code](problems/network/01-incremental-http-parser/solution/main.py) | ✅ solved |
-| 18 | [CIDR planner for a VPC](problems/network/02-cidr-planner/problem.md) | `network` | 🟡 medium | IPv4 math, subnets, overlap detection, address aggregation | [code](problems/network/02-cidr-planner/solution/main.py) | ✅ solved |
-| 19 | [Retrying client with a circuit breaker](problems/network/03-retrying-client-with-a-circuit-breaker/problem.md) | `network` | 🔴 hard | retries, jitter, circuit breaker, idempotency | [code](problems/network/03-retrying-client-with-a-circuit-breaker/solution/main.py) | ✅ solved |
-| 20 | [WebSocket frame decoder](problems/network/04-websocket-frame-decoder/problem.md) | `network` | 🔴 hard | RFC 6455, framing, incremental parsing, masking, fragmentation, UTF-8 | [code](problems/network/04-websocket-frame-decoder/solution/main.py) | ✅ solved |
+| 17 | [A watermark-driven windowed aggregator with retractions](problems/data/05-a-watermark-driven-windowed-aggregator-with-retractions/problem.md) | `data` | 🔴 hard | event time, watermarks, sliding windows, late data, retractions, exactly-once | [code](problems/data/05-a-watermark-driven-windowed-aggregator-with-retractions/solution/main.py) | ✅ solved |
+| 18 | [Incremental HTTP/1.1 request parser](problems/network/01-incremental-http-parser/problem.md) | `network` | 🔴 hard | byte-stream parsing, state machines, chunked encoding, request smuggling, limits | [code](problems/network/01-incremental-http-parser/solution/main.py) | ✅ solved |
+| 19 | [CIDR planner for a VPC](problems/network/02-cidr-planner/problem.md) | `network` | 🟡 medium | IPv4 math, subnets, overlap detection, address aggregation | [code](problems/network/02-cidr-planner/solution/main.py) | ✅ solved |
+| 20 | [Retrying client with a circuit breaker](problems/network/03-retrying-client-with-a-circuit-breaker/problem.md) | `network` | 🔴 hard | retries, jitter, circuit breaker, idempotency | [code](problems/network/03-retrying-client-with-a-circuit-breaker/solution/main.py) | ✅ solved |
+| 21 | [WebSocket frame decoder](problems/network/04-websocket-frame-decoder/problem.md) | `network` | 🔴 hard | RFC 6455, framing, incremental parsing, masking, fragmentation, UTF-8 | [code](problems/network/04-websocket-frame-decoder/solution/main.py) | ✅ solved |
 
 ## Breakdown
 
@@ -35,13 +36,13 @@
 | `backend` | 4 | 4 |
 | `cli` | 2 | 2 |
 | `coding` | 3 | 3 |
-| `data` | 4 | 4 |
+| `data` | 5 | 5 |
 | `network` | 4 | 4 |
 
 | Level | Problems |
 |-------|----------|
 | 🟡 medium | 8 |
-| 🔴 hard | 12 |
+| 🔴 hard | 13 |
 
 ## Repository checks
 
